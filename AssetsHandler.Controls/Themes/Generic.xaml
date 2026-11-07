@@ -1,0 +1,45 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:AssetsHandler.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <!--  Window  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/DarkWindow.xaml" />
+
+        <!--  Common Resources  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Common.xaml" />
+
+        <!--  Toggle Button  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ToggleButton/DarkToggleButton_01.xaml" />
+
+        <!--  Menu  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Menu/DarkMenu_01.xaml" />
+
+        <!--  TreeView  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/TreeView/DarkTreeView_01.xaml" />
+
+        <!--  Button  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Button/DarkButton_01.xaml" />
+
+        <!--  TextBox  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/TextBox/DarkTextBox_01.xaml" />
+
+        <!--  ProgressBar  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ProgressBar/DarkProgressBar_01.xaml" />
+
+        <!--  ToolTip  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ToolTip.xaml" />
+
+        <!--  DarkCheckbox  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/CheckBox/DarkCheckBox_01.xaml" />
+
+        <!--  ComboBox  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ComboBox/DarkComboBox_01.xaml" />
+
+        <!--  DataGrid  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/DataGrid/DarkDataGrid_01.xaml" />
+
+        <!--  ListBox  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ListBox/DarkListBox_01.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

@@ -1,0 +1,435 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:YHG_Assets_Handler.Views.Controls"
+    xmlns:converters="clr-namespace:YHG_Assets_Handler.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:localVMs="clr-namespace:YHG_Assets_Handler.ViewModels"
+    xmlns:localViews="clr-namespace:YHG_Assets_Handler.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="YHG Assets Handler"
+    Width="900"
+    Height="550"
+    Background="{StaticResource AppBg}"
+    Foreground="{StaticResource TextLight}"
+    WindowState="Maximized"
+    mc:Ignorable="d">
+    <DarkWindow.Resources>
+        <DataTemplate DataType="{x:Type localVMs:DefaultInspectorViewModel}">
+            <localViews:DefaultInspectorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type localVMs:UnityAssetsInspectorViewModel}">
+            <localViews:UnityAssetsInspectorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type localVMs:UnityBundleInspectorViewModel}">
+            <localViews:UnityBundleInspectorView />
+        </DataTemplate>
+        <Style x:Key="DarkStatusBarProgressBar_01" TargetType="ProgressBar">
+            <Setter Property="Height" Value="4" />
+            <Setter Property="Background" Value="{StaticResource SurfaceAlt}" />
+            <Setter Property="Foreground" Value="{StaticResource NeonAccent}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="2"
+                            SnapsToDevicePixels="True">
+                            <Grid x:Name="PART_Track">
+                                <Border
+                                    x:Name="PART_Indicator"
+                                    HorizontalAlignment="Left"
+                                    Background="{TemplateBinding Foreground}"
+                                    CornerRadius="2" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </DarkWindow.Resources>
+    <DarkWindow.InputBindings>
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenAssetCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="O"
+            Command="{Binding OpenFolderCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveAsCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveAllCommand}"
+            Modifiers="Ctrl+Alt" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseItemCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="W"
+            Command="{Binding CloseAllCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="F4"
+            Command="{Binding ExitCommand}"
+            Modifiers="Alt" />
+        <KeyBinding
+            Key="A"
+            Command="{Binding AddAssetCommand}"
+            Modifiers="Ctrl+Shift" />
+        <KeyBinding
+            Key="F"
+            Command="{Binding DataGridFilterCommand}"
+            Modifiers="Ctrl+Shift" />
+    </DarkWindow.InputBindings>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <DarkMenu_01 Grid.Row="0">
+            <DarkMenuItem_01 Header="_File">
+                <DarkMenuItem_01
+                    Command="{Binding OpenAssetCommand}"
+                    Header="_Open"
+                    IconKind="File"
+                    InputGestureText="Ctrl+O" />
+                <DarkMenuItem_01
+                    Command="{Binding OpenFolderCommand}"
+                    Header="Open _Folder"
+                    IconKind="FolderOpen"
+                    InputGestureText="Ctrl+Shift+O" />
+                <Separator />
+                <DarkMenuItem_01
+                    Command="{Binding SaveCommand}"
+                    Header="_Save"
+                    IconKind="ContentSave"
+                    InputGestureText="Ctrl+S" />
+                <DarkMenuItem_01
+                    Command="{Binding SaveAsCommand}"
+                    Header="Save _As..."
+                    IconKind="ContentSaveEdit"
+                    InputGestureText="Ctrl+Shift+S" />
+                <DarkMenuItem_01
+                    Command="{Binding SaveAllCommand}"
+                    Header="Save All"
+                    IconKind="ContentSaveAll"
+                    InputGestureText="Ctrl+Alt+S" />
+                <DarkMenuItem_01
+                    Command="{Binding SaveAllAsCommand}"
+                    Header="Save All As..."
+                    IconKind="FolderDownload" />
+                <Separator />
+                <DarkMenuItem_01
+                    Command="{Binding CloseItemCommand}"
+                    CommandParameter="{Binding CurrentExplorerItem}"
+                    Header="_Close"
+                    IconKind="Close"
+                    InputGestureText="Ctrl+W" />
+                <DarkMenuItem_01
+                    Command="{Binding CloseAllCommand}"
+                    Header="Close All"
+                    IconKind="CloseBoxMultiple"
+                    InputGestureText="Ctrl+Shift+W" />
+                <Separator />
+                <DarkMenuItem_01
+                    Command="{Binding ExitCommand}"
+                    Header="E_xit"
+                    IconKind="Power"
+                    InputGestureText="Alt+F4" />
+            </DarkMenuItem_01>
+            <DarkMenuItem_01 Header="_View">
+                <DarkMenuItem_01
+                    Command="{Binding AddAssetCommand}"
+                    Header="Add Assets..."
+                    IconKind="PlusBox"
+                    InputGestureText="Ctrl+Shift+A"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+                <DarkMenuItem_01
+                    Command="{Binding AssetFileInfosCommand}"
+                    Header="File Infos..."
+                    IconKind="InformationOutline"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+                <DarkMenuItem_01
+                    Command="{Binding AddFilesToWorkspaceCommand}"
+                    Header="Add Files To workspace"
+                    IconKind="FileSync"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+                <DarkMenuItem_01
+                    Command="{Binding SetupMonoGeneratorCommand}"
+                    Header="Setup Mono Generator"
+                    IconKind="FileCode"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+                <DarkMenuItem_01
+                    Command="{Binding DataGridFilterCommand}"
+                    Header="Filter"
+                    IconKind="Filter"
+                    InputGestureText="Ctrl+Shift+F"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+            </DarkMenuItem_01>
+            <DarkMenuItem_01 Header="_Tools">
+                <DarkMenuItem_01
+                    Command="{Binding UnityAssetsSplitMergeCommand}"
+                    Header="Unity Assets Merge &amp; Split"
+                    IconKind="FileTree" />
+            </DarkMenuItem_01>
+            <DarkMenuItem_01 Header="_App">
+                <DarkMenuItem_01
+                    Command="{Binding AboutAppCommand}"
+                    Header="About App"
+                    IconKind="InformationOutline" />
+                <Separator />
+                <DarkMenuItem_01
+                    Command="{Binding CheckForUpdateCommand}"
+                    Header="Check for Updates..."
+                    IconKind="Update" />
+            </DarkMenuItem_01>
+            <DarkMenuItem_01 Command="{Binding DonationCommand}" Header="_Donation" />
+        </DarkMenu_01>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" MinWidth="150" />
+                <ColumnDefinition Width="6" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border
+                Grid.Column="0"
+                Margin="6,6,0,6"
+                Padding="2"
+                Style="{StaticResource PanelBorder_01}">
+                <DarkTreeView_01
+                    Name="solution_ex"
+                    AllowDrop="True"
+                    ChildrenMemberPath="Children"
+                    DisplayMemberPath="Name"
+                    DragOver="solution_ex_DragOver"
+                    Drop="solution_ex_Drop"
+                    IconBrushConverter="{StaticResource FileColorConv}"
+                    IconKindConverter="{StaticResource FileIconConv}"
+                    ItemsSource="{Binding RootDirectoryItems}"
+                    SelectedItemChanged="solution_ex_SelectedItemChanged">
+                    <DarkTreeView_01.ItemContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Command="{Binding Tag.RevealInExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
+                                CommandParameter="{Binding}"
+                                Header="Show in Explorer">
+                                <MenuItem.Icon>
+                                    <iconPacks:PackIconMaterial
+                                        Width="13"
+                                        Height="13"
+                                        Foreground="{StaticResource NeonAccent}"
+                                        Kind="FolderEye" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem
+                                Command="{Binding Tag.CloseItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
+                                CommandParameter="{Binding}"
+                                Header="Close">
+                                <MenuItem.Icon>
+                                    <iconPacks:PackIconMaterial
+                                        Width="13"
+                                        Height="13"
+                                        Foreground="#FF6B6B"
+                                        Kind="Close" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DarkTreeView_01.ItemContextMenu>
+                    <DarkTreeView_01.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding OpenAssetCommand}" Header="Open Asset File..." />
+                            <MenuItem Command="{Binding OpenFolderCommand}" Header="Open Folder..." />
+                        </ContextMenu>
+                    </DarkTreeView_01.ContextMenu>
+                </DarkTreeView_01>
+            </Border>
+            <GridSplitter
+                Grid.Column="1"
+                Width="6"
+                HorizontalAlignment="Stretch"
+                Background="Transparent" />
+            <Grid Grid.Column="2" Margin="0,6,6,6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition x:Name="TerminalSplitterRow" Height="0" />
+                    <RowDefinition x:Name="TerminalContainerRow" Height="0" />
+                </Grid.RowDefinitions>
+                <ContentPresenter Grid.Row="0" Content="{Binding CurrentWorkspaceView}" />
+                <GridSplitter
+                    x:Name="TerminalSplitter"
+                    Grid.Row="1"
+                    Height="6"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    Visibility="Collapsed" />
+                <Border
+                    Grid.Row="2"
+                    Background="{StaticResource BarBg}"
+                    Style="{StaticResource PanelBorder_01}">
+                    <RichTextBox x:Name="LogRichTextBox" Style="{StaticResource TerminalLog_01}">
+                        <FlowDocument>
+                            <Paragraph>
+                                <Run Text="Ready for processing..." />
+                            </Paragraph>
+                        </FlowDocument>
+                    </RichTextBox>
+                </Border>
+            </Grid>
+        </Grid>
+        <StatusBar
+            Grid.Row="2"
+            MinHeight="24"
+            Background="{StaticResource BarBg}"
+            BorderBrush="{StaticResource BorderColor}"
+            BorderThickness="0,1,0,0"
+            FontSize="11"
+            Foreground="{StaticResource TextMuted}">
+            <StatusBarItem>
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial
+                        x:Name="ReadyIcon"
+                        Width="12"
+                        Height="12"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource AccentGreen}"
+                        Kind="CheckCircle" />
+                    <iconPacks:PackIconMaterial
+                        x:Name="BusyIcon"
+                        Width="12"
+                        Height="12"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Foreground="#FFF59E0B"
+                        Kind="Loading"
+                        RenderTransformOrigin="0.5,0.5"
+                        Visibility="Collapsed">
+                        <iconPacks:PackIconMaterial.RenderTransform>
+                            <RotateTransform x:Name="BusySpin" />
+                        </iconPacks:PackIconMaterial.RenderTransform>
+                    </iconPacks:PackIconMaterial>
+                    <TextBlock
+                        x:Name="ReadyText"
+                        VerticalAlignment="Center"
+                        Text="Ready" />
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem x:Name="TaskItem" Visibility="Collapsed">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        MaxWidth="160"
+                        Margin="12,0,8,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding Title}"
+                        TextTrimming="CharacterEllipsis"
+                        ToolTip="{Binding Status}" />
+                    <DarkProgressBar_01
+                        Width="120"
+                        Height="6"
+                        VerticalAlignment="Center"
+                        CornerRadius="3"
+                        Maximum="100"
+                        ProgressClick="DarkProgressBar_01_ProgressClick"
+                        ToolTipFormat="{}{0:0}% complete"
+                        Value="{Binding BarValue, Mode=OneWay}" />
+                    <TextBlock
+                        MinWidth="32"
+                        Margin="6,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding PercentText}"
+                        TextAlignment="Right" />
+                    <DarkButton_01
+                        Width="18"
+                        Height="18"
+                        Margin="4,0,0,0"
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Command="{Binding CancelCommand}"
+                        CornerRadius="3"
+                        Focusable="False"
+                        Foreground="{StaticResource TextMuted}"
+                        OnHoverBg="#33FFFFFF"
+                        OnHoverBorder="Transparent"
+                        OnHoverForeground="{StaticResource TextLight}"
+                        ToolTip="Cancel"
+                        Visibility="{Binding CanCancelNow, Converter={StaticResource BoolToVis}}">
+                        <iconPacks:PackIconMaterial
+                            Width="9"
+                            Height="9"
+                            Kind="Close" />
+                    </DarkButton_01>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        x:Name="ToggleStatusBoxBtn"
+                        Click="ToggleStatusBoxBtn_Click"
+                        Style="{StaticResource StatusBarButton_01}"
+                        ToolTip="Toggle Output / Terminal Panel">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconMaterial
+                                Width="11"
+                                Height="11"
+                                Margin="0,0,4,0"
+                                VerticalAlignment="Center"
+                                Kind="Console" />
+                            <TextBlock VerticalAlignment="Center" Text="Output" />
+                        </StackPanel>
+                    </Button>
+                    <iconPacks:PackIconMaterial
+                        Width="12"
+                        Height="12"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextMuted}"
+                        Kind="FileOutline" />
+                    <TextBlock VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="{Binding CurrentWorkspaceView.SelectedCounts, StringFormat='Selected: {0} item(s)'}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentWorkspaceView}" Value="{x:Null}">
+                                        <Setter Property="Text" Value="No item selected" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentWorkspaceView.SelectedCounts}" Value="0">
+                                        <Setter Property="Text" Value="No item selected" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+        <controls:ToastLayer
+            Grid.RowSpan="99"
+            Grid.ColumnSpan="99"
+            Panel.ZIndex="100" />
+    </Grid>
+</DarkWindow>

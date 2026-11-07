@@ -1,0 +1,142 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.Updater.Updater"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="YHG - Update Manager"
+    Width="600"
+    Height="480"
+    Background="#FF141414"
+    ResizeMode="NoResize"
+    ShowButtons="Minimize,Close"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Status Header  -->
+        <TextBlock
+            x:Name="lblStatus"
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            FontSize="15"
+            FontWeight="Bold"
+            Foreground="{StaticResource NeonAccent}"
+            Text="SYSTEM: Ready to check" />
+
+        <!--  Version Meta  -->
+        <TextBlock
+            x:Name="lblVersionInfo"
+            Grid.Row="1"
+            Margin="0,4,0,0"
+            FontFamily="Consolas"
+            FontSize="12"
+            Foreground="{StaticResource TextMuted}"
+            Text="Current: v1.0.0" />
+
+        <!--  Changelog Title  -->
+        <TextBlock
+            x:Name="lblWhatsNewTitle"
+            Grid.Row="2"
+            Margin="0,14,0,6"
+            FontSize="12"
+            FontWeight="Bold"
+            Foreground="{StaticResource AccentWarm}"
+            Text="&gt; CHANGELOG / WHAT'S NEW:"
+            Visibility="Collapsed" />
+
+        <!--  Changelog Box  -->
+        <DarkTextBox_01
+            x:Name="rtbWhatsNew"
+            Grid.Row="3"
+            Padding="10"
+            VerticalContentAlignment="Top"
+            AcceptsReturn="True"
+            FontSize="12"
+            IsReadOnly="True"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="Collapsed" />
+
+        <!--  Package Selection Panel  -->
+        <Border
+            x:Name="panelPackageSelection"
+            Grid.Row="4"
+            Margin="0,10,0,0"
+            Padding="10"
+            Background="#1E1E1E"
+            BorderBrush="#333333"
+            BorderThickness="1"
+            CornerRadius="6"
+            Visibility="Collapsed">
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Foreground="#DDD"
+                    Text="Select Package Edition:" />
+                <RadioButton
+                    x:Name="rbStandalone"
+                    Margin="0,2,0,4"
+                    Foreground="White"
+                    IsChecked="True">
+                    <TextBlock x:Name="txtStandaloneInfo" Text="Standalone (Self-contained) - Zero dependency [Fetching size...]" />
+                </RadioButton>
+                <RadioButton
+                    x:Name="rbLightweight"
+                    Margin="0,2,0,0"
+                    Foreground="White">
+                    <TextBlock x:Name="txtLightweightInfo" Text="Lightweight (Framework-dependent) - Requires .NET Runtime [Fetching size...]" />
+                </RadioButton>
+            </StackPanel>
+        </Border>
+
+        <!--  Progress Track  -->
+        <DarkProgressBar_01
+            x:Name="progressBar1"
+            Grid.Row="5"
+            Height="16"
+            Margin="0,12,0,0"
+            BlendRangeColors="True"
+            IsClickable="False"
+            ShowPercentToolTip="True"
+            UseRangeColors="True"
+            Visibility="Collapsed">
+            <DarkProgressBar_01.ColorStops>
+                <ProgressColorStop Percent="0" Color="Red" />
+                <ProgressColorStop Percent="50" Color="Yellow" />
+                <ProgressColorStop Percent="100" Color="LimeGreen" />
+            </DarkProgressBar_01.ColorStops>
+        </DarkProgressBar_01>
+
+        <!--  Primary Action Button  -->
+        <DarkButton_01
+            x:Name="btnAction"
+            Grid.Row="6"
+            Width="220"
+            Height="40"
+            Margin="0,14,0,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Background="#FF7828C8"
+            BorderThickness="0"
+            Click="btnAction_Click"
+            Content="Check for Update"
+            CornerRadius="6"
+            FontWeight="Bold"
+            Foreground="White"
+            OnHoverBg="#FF9632FA"
+            OnHoverForeground="White" />
+    </Grid>
+</DarkWindow>

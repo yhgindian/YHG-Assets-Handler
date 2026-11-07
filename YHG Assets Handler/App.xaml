@@ -1,0 +1,103 @@
+﻿<Application
+    x:Class="YHG_Assets_Handler.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:YHG_Assets_Handler.Converters"
+    ShutdownMode="OnMainWindowClose"
+    StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:FileTypeToIconConverter x:Key="FileIconConv" />
+            <converters:FileTypeToColorConverter x:Key="FileColorConv" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <Style x:Key="StatusBarButton_01" TargetType="Button">
+                <Setter Property="Margin" Value="0,0,10,0" />
+                <Setter Property="Padding" Value="6,1" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Background" Value="{StaticResource SurfaceAlt}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="{StaticResource NeonAccent}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                                <ContentPresenter
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource HoverBg}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PanelBg}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="TerminalLog_01" TargetType="RichTextBox">
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="AcceptsReturn" Value="True" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FontFamily" Value="Consolas" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="IsReadOnly" Value="True" />
+                <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            </Style>
+            <Style x:Key="DarkTabItem_01" TargetType="TabItem">
+                <Setter Property="Background" Value="{StaticResource SurfaceAlt}" />
+                <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+                <Setter Property="Padding" Value="14,6" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Border
+                                x:Name="Border"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0,0,1,1">
+                                <ContentPresenter
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    ContentSource="Header" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBg}" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextLight}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource PanelBg}" />
+                                    <Setter TargetName="Border" Property="BorderThickness" Value="0,2,0,0" />
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NeonAccent}" />
+                                    <Setter Property="Foreground" Value="{StaticResource NeonAccent}" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="DarkTabControl_01" TargetType="TabControl">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource DarkTabItem_01}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

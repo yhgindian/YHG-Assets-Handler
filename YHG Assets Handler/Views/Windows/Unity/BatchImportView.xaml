@@ -1,0 +1,134 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.Unity.BatchImportView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:YHG_Assets_Handler.Views.Windows.Unity"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Batch Import"
+    Width="820"
+    Height="480"
+    MinWidth="600"
+    MinHeight="380"
+    Background="{StaticResource AppBg}"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Main Workspace Panels (Split Left / Right)  -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <!--  Matching Assets (Left)  -->
+                <ColumnDefinition Width="1.8*" MinWidth="180" />
+                <ColumnDefinition Width="6" />
+                <!--  Assets To Import (Right)  -->
+                <ColumnDefinition Width="*" MinWidth="160" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Left: Matching Assets  -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Margin="0,0,0,8"
+                    Style="{StaticResource SectionTitle_01}"
+                    Text="Matching assets" />
+
+                <ListBox
+                    Grid.Row="1"
+                    Background="{StaticResource PanelBg}"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="1"
+                    DisplayMemberPath="Description"
+                    Foreground="{StaticResource TextLight}"
+                    ItemsSource="{Binding MatchingAssetItems}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    SelectedItem="{Binding SelectedMatchingItem}" />
+            </Grid>
+
+            <!--  Splitter Divider  -->
+            <GridSplitter
+                Grid.Column="1"
+                Width="3"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="{StaticResource BorderColor}"
+                ShowsPreview="True" />
+
+            <!--  Right: Assets To Import  -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Margin="0,0,0,8"
+                    Style="{StaticResource SectionTitle_01}"
+                    Text="Assets To Import" />
+
+                <ListBox
+                    Grid.Row="1"
+                    Background="{StaticResource PanelBg}"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="1"
+                    Foreground="{StaticResource TextLight}"
+                    ItemsSource="{Binding SelectedMatchingItem.MatchingFiles}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    SelectedItem="{Binding SelectedFileToImport}" />
+            </Grid>
+        </Grid>
+
+        <!--  Footer / Action Buttons  -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Left: Edit / Browse Custom File Button  -->
+            <DarkButton_01
+                Grid.Column="0"
+                Width="95"
+                Height="28"
+                Command="{Binding EditMatchFileCommand}"
+                Content="Edit"
+                OnHoverBg="{StaticResource HoverBg}"
+                OnHoverBorder="{StaticResource NeonAccent}"
+                OnHoverForeground="{StaticResource NeonAccent}" />
+
+            <!--  Right: Ok / Cancel Buttons  -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <DarkButton_01
+                    Width="95"
+                    Height="28"
+                    Margin="0,0,8,0"
+                    Command="{Binding OkCommand}"
+                    Content="Ok"
+                    OnHoverBg="{StaticResource HoverBg}"
+                    OnHoverBorder="{StaticResource AccentGreen}"
+                    OnHoverForeground="{StaticResource AccentGreen}" />
+
+                <DarkButton_01
+                    Width="95"
+                    Height="28"
+                    Command="{Binding CancelCommand}"
+                    Content="Cancel"
+                    OnHoverBg="#25161A"
+                    OnHoverBorder="#FF5555"
+                    OnHoverForeground="#FF5555" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</DarkWindow>

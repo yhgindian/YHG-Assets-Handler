@@ -1,0 +1,100 @@
+﻿<controls:DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.Unity.UnityPPtrPickerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:AssetsHandler.Controls;assembly=AssetsHandler.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Pick PPtr"
+    Width="460"
+    Background="{StaticResource AppBg}"
+    ResizeMode="NoResize"
+    ShowButtons="Close"
+    SizeToContent="Height"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Grid Margin="16,14,16,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="72" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  1. m_FileID  -->
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="0,0,8,10"
+            VerticalAlignment="Center"
+            FontSize="13"
+            Foreground="#CCCCCC"
+            Text="m_FileID" />
+
+        <controls:DarkComboBox_01
+            Grid.Row="0"
+            Grid.Column="1"
+            Height="28"
+            Margin="0,0,0,10"
+            DisplayMemberPath="DisplayText"
+            IsSearchEnabled="True"
+            ItemsSource="{Binding AvailableFiles}"
+            MaxDropDownHeight="220"
+            SearchMemberPath="DisplayText"
+            SearchPlaceholder="Search file..."
+            SelectedItem="{Binding SelectedFileTarget, Mode=TwoWay}" />
+
+        <!--  2. m_PathID  -->
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="0,0,8,6"
+            VerticalAlignment="Center"
+            FontSize="13"
+            Foreground="#CCCCCC"
+            Text="m_PathID" />
+
+        <controls:DarkComboBox_01
+            Grid.Row="1"
+            Grid.Column="1"
+            Height="28"
+            Margin="0,0,0,6"
+            DisplayMemberPath="DisplayText"
+            IsSearchEnabled="True"
+            ItemsSource="{Binding TargetAssets}"
+            MaxDropDownHeight="260"
+            SearchMemberPath="DisplayText"
+            SearchPlaceholder="Search PathID, Type or Name..."
+            SelectedItem="{Binding SelectedAssetModel, Mode=TwoWay}" />
+
+        <!--  3. Status  -->
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="1"
+            MinHeight="16"
+            Margin="2,0,0,14"
+            FontFamily="Consolas"
+            FontSize="11"
+            Foreground="{Binding VerificationColor}"
+            Text="{Binding VerificationText}"
+            TextTrimming="CharacterEllipsis" />
+
+        <!--  4. Save  -->
+        <controls:DarkButton_01
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Height="32"
+            Command="{Binding ApplyCommand}"
+            Content="Save"
+            IsDefault="True"
+            OnHoverBg="#16342A"
+            OnHoverBorder="#4EC9B0"
+            OnHoverForeground="#FFFFFF" />
+    </Grid>
+</controls:DarkWindow>

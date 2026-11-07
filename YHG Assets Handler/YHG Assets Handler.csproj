@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<RootNamespace>YHG_Assets_Handler</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoWarn>$(NoWarn);NU1701;NU1702;NU1901;NU1902;NU1903;NU1904;NU1605</NoWarn>
+		<ApplicationIcon>YHG-Assets-Handler-Logo.ico</ApplicationIcon>
+		<Version>0.1.0</Version>
+		<AssemblyVersion>0.1.0.0</AssemblyVersion>
+		<FileVersion>0.1.0.0</FileVersion>
+		<InformationalVersion>0.1.0-test</InformationalVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="ViewModels\Tools\**" />
+	  <EmbeddedResource Remove="ViewModels\Tools\**" />
+	  <None Remove="ViewModels\Tools\**" />
+	  <Page Remove="ViewModels\Tools\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="YHG-Assets-Handler-Logo.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Fmod5Sharp" Version="3.1.0" />
+		<PackageReference Include="HelixToolkit.Wpf" Version="3.1.2" />
+		<PackageReference Include="StbImageSharp" Version="2.30.16" />
+		<PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
+		<PackageReference Include="TagLibSharp" Version="2.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AssetsHandler.Controls\AssetsHandler.Controls.csproj" />
+		<ProjectReference Include="..\AssetsHandler.Core\AssetsHandler.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="YHGIndian\classdata.tpk">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
+	<!-- 🔹 1. Native DLLs for Normal Build -->
+	<Target Name="CopyNativeLibrariesOnBuild" AfterTargets="Build">
+		<ItemGroup>
+			<NativeDlls Include="$(SolutionDir)x64\$(Configuration)\*.dll" />
+			<NativeDlls Include="$(MSBuildProjectDirectory)\..\NativeLibs\win-x64\**\*.dll" />
+			<NativeDlls Include="$(MSBuildProjectDirectory)\NativeLibs\win-x64\**\*.dll" />
+		</ItemGroup>
+		<PropertyGroup>
+			<NativeBuildDir>$(TargetDir)runtimes\win-x64\native\</NativeBuildDir>
+		</PropertyGroup>
+		<Message Importance="High" Text="[CopyNativeLibrariesOnBuild] Copying DLLs to $(NativeBuildDir)" />
+		<Copy SourceFiles="@(NativeDlls)" DestinationFolder="$(NativeBuildDir)" SkipUnchangedFiles="true" />
+	</Target>
+
+	<!-- 🔹 2. Native DLLs for Publish Only -->
+	<Target Name="CopyNativeLibrariesOnPublish" AfterTargets="Publish">
+		<ItemGroup>
+			<NativePublishDlls Include="$(SolutionDir)x64\$(Configuration)\*.dll" />
+			<NativePublishDlls Include="$(MSBuildProjectDirectory)\..\NativeLibs\win-x64\**\*.dll" />
+			<NativePublishDlls Include="$(MSBuildProjectDirectory)\NativeLibs\win-x64\**\*.dll" />
+		</ItemGroup>
+		<PropertyGroup>
+			<NativePublishDir>$(PublishDir)runtimes\win-x64\native\</NativePublishDir>
+		</PropertyGroup>
+		<Message Importance="High" Text="[CopyNativeLibrariesOnPublish] Copying DLLs to $(NativePublishDir)" />
+		<Copy SourceFiles="@(NativePublishDlls)" DestinationFolder="$(NativePublishDir)" SkipUnchangedFiles="true" />
+	</Target>
+
+	<ItemGroup>
+		<Folder Include="Editor\Core\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Assets\qr_code.jpeg" />
+	</ItemGroup>
+
+</Project>

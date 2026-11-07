@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AssetsTools.NET" Version="3.0.5" />
+		<PackageReference Include="AssetsTools.NET.MonoCecil" Version="3.0.4" />
+		<PackageReference Include="AssetsTools.NET.Texture" Version="3.0.2" />
+		<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+		<PackageReference Include="Newtonsoft.Json" Version="14.0.1-beta2" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="YHG.FastBF" Version="1.0.0" />
+	</ItemGroup>
+
+</Project>

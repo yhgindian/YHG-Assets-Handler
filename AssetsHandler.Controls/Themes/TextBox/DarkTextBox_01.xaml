@@ -1,0 +1,71 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:AssetsHandler.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type local:DarkTextBox_01}">
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{StaticResource SurfaceAlt}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource TextLight}" />
+        <Setter Property="CaretBrush" Value="{StaticResource TextLight}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource TextLight}" />
+        <Setter Property="OnHoverBg" Value="{StaticResource SurfaceAlt}" />
+        <Setter Property="OnHoverForeground" Value="{StaticResource TextLight}" />
+        <Setter Property="OnHoverBorder" Value="{StaticResource BorderColor}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DarkTextBox_01}">
+                    <Border
+                        x:Name="Border"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Focusable="False"
+                                HorizontalScrollBarVisibility="Hidden"
+                                VerticalScrollBarVisibility="Hidden" />
+                            <TextBlock
+                                x:Name="PlaceholderText"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                FontWeight="Normal"
+                                Foreground="{TemplateBinding PlaceholderForeground}"
+                                IsHitTestVisible="False"
+                                Opacity="0.5"
+                                Text="{TemplateBinding Placeholder}"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{Binding OnHoverBg, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{Binding OnHoverBorder, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Foreground" Value="{Binding OnHoverForeground, RelativeSource={RelativeSource Self}}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{Binding OnHoverBorder, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

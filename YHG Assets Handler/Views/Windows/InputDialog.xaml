@@ -1,0 +1,65 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.InputDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Binding DialogTitle}"
+    Width="420"
+    Background="{StaticResource AppBg}"
+    Foreground="{StaticResource TextLight}"
+    IconMode="None"
+    ResizeMode="NoResize"
+    ShowButtons="Close"
+    ShowInTaskbar="False"
+    SizeToContent="Height"
+    WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="10,6,10,10">
+
+        <TextBlock
+            Margin="0,0,0,12"
+            Foreground="{StaticResource TextMuted}"
+            Text="{Binding Message}"
+            TextWrapping="Wrap" />
+
+        <DarkTextBox_01
+            x:Name="InputTextBox"
+            Height="30"
+            VerticalContentAlignment="Center"
+            OnHoverBorder="{StaticResource NeonAccent}"
+            Placeholder="{Binding Placeholder}"
+            Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock
+            Margin="0,6,0,0"
+            FontSize="11"
+            Foreground="#FFE74C3C"
+            Text="{Binding ErrorMessage}"
+            TextWrapping="Wrap"
+            Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}" />
+
+        <StackPanel
+            Margin="0,14,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <DarkButton_01
+                Width="84"
+                Height="30"
+                Margin="0,0,8,0"
+                Padding="0"
+                Click="OkButton_Click"
+                Content="OK"
+                OnHoverBg="#064E3B"
+                OnHoverBorder="#10B981"
+                OnHoverForeground="#10B981" />
+            <DarkButton_01
+                Width="84"
+                Height="30"
+                Padding="0"
+                Click="CancelButton_Click"
+                Content="Cancel"
+                OnHoverBg="#2A1215"
+                OnHoverBorder="#EF4444"
+                OnHoverForeground="#EF4444" />
+        </StackPanel>
+    </StackPanel>
+</DarkWindow>

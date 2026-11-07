@@ -1,0 +1,96 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.Unity.UnityAssetDataViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:YHG_Assets_Handler.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Unity Asset Inspector"
+    Width="950"
+    Height="600"
+    Background="#181818"
+    IconMode="None"
+    mc:Ignorable="d">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Header Info Bar  -->
+        <Border
+            Grid.Row="0"
+            Margin="0,0,0,10"
+            Padding="12,8"
+            Background="#202023"
+            CornerRadius="6">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    x:Name="TxtAssetName"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Foreground="#FFFFFF"
+                    Text="Asset Name" />
+                <TextBlock
+                    Margin="10,0,0,0"
+                    FontSize="13"
+                    Foreground="#808080"
+                    Text=" | PathID: " />
+                <TextBlock
+                    x:Name="TxtPathId"
+                    FontSize="13"
+                    Foreground="#4EC9B0"
+                    Text="0" />
+                <TextBlock
+                    Margin="10,0,0,0"
+                    FontSize="13"
+                    Foreground="#808080"
+                    Text=" | Class: " />
+                <TextBlock
+                    x:Name="TxtClassName"
+                    FontSize="13"
+                    Foreground="#DCDCAA"
+                    Text="GameObject" />
+            </StackPanel>
+        </Border>
+
+        <!--  UABEA Engine Custom Tree  -->
+        <Border
+            Grid.Row="1"
+            Padding="4"
+            Background="#181818"
+            BorderBrush="#2D2D30"
+            BorderThickness="1"
+            CornerRadius="6">
+            <controls:AssetDataTreeView x:Name="DataTreeView" />
+        </Border>
+
+        <!--  Bottom Actions  -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                x:Name="TxtStatus"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Foreground="#858585"
+                Text="Ready" />
+
+            <DarkButton_01
+                x:Name="BtnEditData"
+                Grid.Column="1"
+                Padding="16,6"
+                Click="BtnEditData_Click"
+                Content="Edit In External Editor"
+                OnHoverBorder="#00e2a2"
+                OnHoverBg="#00ffb77a"
+                OnHoverForeground="#00e2a2" />
+        </Grid>
+    </Grid>
+</DarkWindow>

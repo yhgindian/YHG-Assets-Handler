@@ -1,0 +1,150 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:AssetsHandler.Controls"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type local:DarkWindow}">
+        <Setter Property="Background" Value="#FF1E1E1E" />
+        <Setter Property="Foreground" Value="#FFF1F1F1" />
+        <Setter Property="shell:WindowChrome.WindowChrome">
+            <Setter.Value>
+                <shell:WindowChrome
+                    CaptionHeight="30"
+                    CornerRadius="0"
+                    GlassFrameThickness="0"
+                    ResizeBorderThickness="6"
+                    UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DarkWindow}">
+                    <Border x:Name="PART_Root">
+                        <Border
+                            x:Name="PART_Frame"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="#FF3F3F46"
+                            BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid Background="#FF2D2D30">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image
+                                        x:Name="PART_Icon"
+                                        Grid.Column="0"
+                                        Width="16"
+                                        Height="16"
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                        Source="{TemplateBinding TitleBarIcon}" />
+                                    <TextBlock
+                                        x:Name="PART_Title"
+                                        Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="#FFC5C5C5"
+                                        Text="{TemplateBinding Title}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <local:DarkButton_01
+                                            x:Name="PART_MinimizeButton"
+                                            Width="46"
+                                            Height="30"
+                                            Padding="0"
+                                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            CornerRadius="0"
+                                            Focusable="False"
+                                            Foreground="#FFF1F1F1"
+                                            OnHoverBg="#33FFFFFF"
+                                            OnHoverBorder="Transparent"
+                                            OnHoverForeground="#FFF1F1F1"
+                                            ToolTip="Minimize">
+                                            <mah:PackIconMaterial
+                                                Width="10"
+                                                Height="10"
+                                                Kind="WindowMinimize" />
+                                        </local:DarkButton_01>
+                                        <local:DarkButton_01
+                                            x:Name="PART_MaximizeButton"
+                                            Width="46"
+                                            Height="30"
+                                            Padding="0"
+                                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            CornerRadius="0"
+                                            Focusable="False"
+                                            Foreground="#FFF1F1F1"
+                                            OnHoverBg="#33FFFFFF"
+                                            OnHoverBorder="Transparent"
+                                            OnHoverForeground="#FFF1F1F1"
+                                            ToolTip="Maximize">
+                                            <mah:PackIconMaterial
+                                                x:Name="PART_MaxIcon"
+                                                Width="10"
+                                                Height="10"
+                                                Kind="WindowMaximize" />
+                                        </local:DarkButton_01>
+                                        <local:DarkButton_01
+                                            x:Name="PART_CloseButton"
+                                            Width="46"
+                                            Height="30"
+                                            Padding="0"
+                                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            CornerRadius="0"
+                                            Focusable="False"
+                                            Foreground="#FFF1F1F1"
+                                            OnHoverBg="#FFE81123"
+                                            OnHoverBorder="Transparent"
+                                            OnHoverForeground="White"
+                                            ToolTip="Close">
+                                            <mah:PackIconMaterial
+                                                Width="10"
+                                                Height="10"
+                                                Kind="Close" />
+                                        </local:DarkButton_01>
+                                    </StackPanel>
+                                </Grid>
+                                <AdornerDecorator Grid.Row="1">
+                                    <ContentPresenter Margin="5" />
+                                </AdornerDecorator>
+                            </Grid>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter TargetName="PART_Root" Property="Padding" Value="{x:Static SystemParameters.WindowResizeBorderThickness}" />
+                            <Setter TargetName="PART_Frame" Property="BorderThickness" Value="0" />
+                            <Setter TargetName="PART_MaxIcon" Property="Kind" Value="WindowRestore" />
+                            <Setter TargetName="PART_MaximizeButton" Property="ToolTip" Value="Restore" />
+                        </Trigger>
+                        <Trigger Property="TitleBarIcon" Value="{x:Null}">
+                            <Setter TargetName="PART_Icon" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsActive" Value="False">
+                            <Setter TargetName="PART_Title" Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

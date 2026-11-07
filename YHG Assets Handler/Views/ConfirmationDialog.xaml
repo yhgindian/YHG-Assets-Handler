@@ -1,0 +1,66 @@
+﻿<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.ConfirmationDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:YHG_Assets_Handler.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Confirm Action"
+    Width="460"
+    MinWidth="400"
+    MaxWidth="520"
+    Background="{StaticResource AppBg}"
+    IconMode="None"
+    ResizeMode="NoResize"
+    ShowButtons="Close"
+    SizeToContent="Height"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock
+            x:Name="TitleBlock"
+            Grid.Row="0"
+            Margin="0,0,0,10"
+            FontSize="15"
+            FontWeight="SemiBold"
+            Foreground="{StaticResource TextLight}"
+            Text="Confirm Deletion" />
+        <TextBlock
+            x:Name="MessageBlock"
+            Grid.Row="1"
+            Margin="0,0,0,20"
+            FontSize="13"
+            Foreground="{StaticResource TextMuted}"
+            LineHeight="20"
+            Text="Are you sure you want to proceed?"
+            TextWrapping="Wrap" />
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <DarkButton_01
+                    Width="88"
+                    Margin="0,0,8,0"
+                    Click="OnCancelClick"
+                    Content="Cancel"
+                    OnHoverBg="{StaticResource HoverBg}"
+                    OnHoverBorder="{StaticResource BorderColor}"
+                    OnHoverForeground="{StaticResource TextLight}" />
+                <DarkButton_01
+                    Width="88"
+                    Click="OnConfirmClick"
+                    Content="Confirm"
+                    OnHoverBg="#2A171B"
+                    OnHoverBorder="#FF5555"
+                    OnHoverForeground="#FF5555" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</DarkWindow>

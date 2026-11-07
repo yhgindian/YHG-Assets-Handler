@@ -1,0 +1,17 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AssetsHandler.Controls/AssetsHandler.Controls.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="AssetsHandler.Core/AssetsHandler.Core.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="TexToolHelper/TexToolHelper.vcxproj" Id="f01527f6-0cc1-49e4-ac14-2b96a001a39d" />
+  <Project Path="YHG Assets Handler/YHG Assets Handler.csproj">
+    <BuildDependency Project="TexToolHelper/TexToolHelper.vcxproj" />
+  </Project>
+</Solution>

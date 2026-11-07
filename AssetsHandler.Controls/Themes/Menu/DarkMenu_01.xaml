@@ -1,0 +1,176 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:AssetsHandler.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type local:DarkMenuItem_01}">
+        <Setter Property="Foreground" Value="{StaticResource TextLight}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="IconBrush" Value="{StaticResource NeonAccent}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DarkMenuItem_01}">
+                    <Grid>
+                        <Border
+                            x:Name="Bd"
+                            Margin="3,1"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Gesture" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Arrow" />
+                                </Grid.ColumnDefinitions>
+                                <Grid
+                                    x:Name="IconHost"
+                                    Width="24"
+                                    Margin="0,0,6,0">
+                                    <iconPacks:PackIconMaterial
+                                        x:Name="Icon"
+                                        Width="14"
+                                        Height="14"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Foreground="{TemplateBinding IconBrush}"
+                                        Kind="{TemplateBinding IconKind}" />
+                                    <ContentPresenter
+                                        x:Name="IconPresenter"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        ContentSource="Icon" />
+                                    <Path
+                                        x:Name="Check"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Data="M 0,5 L 3.5,8.5 L 10,1"
+                                        Stroke="{TemplateBinding IconBrush}"
+                                        StrokeEndLineCap="Round"
+                                        StrokeStartLineCap="Round"
+                                        StrokeThickness="1.8"
+                                        Visibility="Collapsed" />
+                                </Grid>
+                                <ContentPresenter
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True" />
+                                <TextBlock
+                                    x:Name="Gesture"
+                                    Grid.Column="2"
+                                    Margin="28,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource TextMuted}"
+                                    Text="{TemplateBinding InputGestureText}" />
+                                <Path
+                                    x:Name="Arrow"
+                                    Grid.Column="3"
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Data="M 0,0 L 4,4 L 0,8"
+                                    Stroke="{StaticResource TextMuted}"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1.4"
+                                    Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+                        <Popup
+                            x:Name="PART_Popup"
+                            AllowsTransparency="True"
+                            Focusable="False"
+                            IsOpen="{TemplateBinding IsSubmenuOpen}"
+                            Placement="Bottom"
+                            PopupAnimation="Fade">
+                            <Border
+                                MinWidth="200"
+                                Margin="0,2,8,8"
+                                Padding="3"
+                                Background="{StaticResource SurfaceAlt}"
+                                BorderBrush="{StaticResource BorderColor}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <ItemsPresenter Grid.IsSharedSizeScope="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Role" Value="TopLevelHeader">
+                            <Setter Property="Padding" Value="10,4" />
+                            <Setter TargetName="IconHost" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Gesture" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="TopLevelItem">
+                            <Setter Property="Padding" Value="10,4" />
+                            <Setter TargetName="IconHost" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Gesture" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="SubmenuHeader">
+                            <Setter TargetName="PART_Popup" Property="Placement" Value="Right" />
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IconKind" Value="{x:Static iconPacks:PackIconMaterialKind.None}">
+                            <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsCheckable" Value="True">
+                            <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="IconPresenter" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBg}" />
+                        </Trigger>
+                        <Trigger Property="IsSubmenuOpen" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource HoverBg}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type local:DarkMenu_01}">
+        <Setter Property="Background" Value="{StaticResource BarBg}" />
+        <Setter Property="Foreground" Value="{StaticResource TextLight}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DarkMenu_01}">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{StaticResource BorderColor}"
+                        BorderThickness="0,0,0,1">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Resources>
+            <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">
+                <Setter Property="Height" Value="1" />
+                <Setter Property="Margin" Value="8,4" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Separator}">
+                            <Border Background="{StaticResource BorderColor}" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Style.Resources>
+    </Style>
+</ResourceDictionary>
