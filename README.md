@@ -122,7 +122,6 @@ Choose the edition best suited for your environment.
 |---|---|---|
 | **Distribution** | Fully self-contained portable package | Compact framework-dependent binary |
 | **Prerequisites** | None (All runtimes bundled) | Requires [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) |
-| **Archive Size** | ~60–80 MB | ~15–20 MB |
 | **Architecture** | Windows x64 | Windows x64 |
 | **Best Suited For** | Zero-setup immediate deployment | Fast updates and minimal disk usage |
 
