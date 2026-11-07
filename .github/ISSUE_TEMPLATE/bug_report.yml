@@ -1,0 +1,52 @@
+name: 🐛 Bug Report
+description: File a bug report for YHG Assets Handler
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill in the details below to help us understand and resolve the issue.
+
+  - type: input
+    id: app_version
+    attributes:
+      label: Application Version
+      placeholder: "e.g., v1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "e.g., Windows 10 x64 / Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Bug Description
+      description: Describe clearly what went wrong or what error you encountered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide the steps to trigger this bug.
+      placeholder: |
+        1. Open file '...'
+        2. Select asset '...'
+        3. Click 'Export'
+        4. See the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Log / Screenshots
+      description: Paste any error popup message, exception details, or drag-and-drop screenshots here.
