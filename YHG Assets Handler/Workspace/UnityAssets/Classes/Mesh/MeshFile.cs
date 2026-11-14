@@ -486,8 +486,8 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Classes.Mesh
             if (m_LocalAABB != null)
             {
                 float radius = Math.Max(m_LocalAABB.m_Extent.X, Math.Max(m_LocalAABB.m_Extent.Y, m_LocalAABB.m_Extent.Z));
-                if (!(tempField = baseField["m_MeshMetrics[0]"]).IsDummy) tempField.AsFloat = radius;
-                if (!(tempField = baseField["m_MeshMetrics[1]"]).IsDummy) tempField.AsFloat = m_LocalAABB.m_Extent.X * m_LocalAABB.m_Extent.Y * m_LocalAABB.m_Extent.Z;
+                if (!(tempField = baseField["m_MeshMetrics[0]"]).IsDummy) tempField.AsFloat = m_MeshMetrics[0];
+                if (!(tempField = baseField["m_MeshMetrics[1]"]).IsDummy) tempField.AsFloat = m_MeshMetrics[1];
             }
 
             // 12. General Flags

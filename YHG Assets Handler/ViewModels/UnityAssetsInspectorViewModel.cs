@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +21,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
 using YHG_Assets_Handler.Editor.Unity;
+using YHG_Assets_Handler.Migration.UnityAssets;
 using YHG_Assets_Handler.Models;
 using YHG_Assets_Handler.Utils.Collections;
 using YHG_Assets_Handler.Utils.Unity;
@@ -1502,5 +1504,173 @@ namespace YHG_Assets_Handler.ViewModels
 
             return successfullySavedFiles.Count > 0;
         }
+
+#if DEBUG
+        public async Task MigrateAssetFile()
+        {
+            _ = MigrateAssetFile(workspace.LoadedFiles[0]);
+        }
+
+        public async Task MigrateAssetFile(AssetsFileInstance inst)
+        {
+            while (true)
+            {
+                var opsnParam = new List<OptionParam>()
+                {
+                    new OptionParam("formatVersion", "Enter Unity Format Version", OptionKind.Number, inst.file.Header.Version)
+                    {
+                        Validator = v =>
+                        {
+                            if (v is double u)
+                            {
+                                if (u < 22)
+                                    return "Minimum we support 22";
+                                return null;
+                            }
+                            return "Enter a valid version";
+                        }
+                    },
+                    new OptionParam("unityVersion", "Enter Unity Engine Version", OptionKind.Text, inst.file.Metadata.UnityVersion)
+                    {
+                        Validator = v =>
+                        {
+                            if (v is not string versionStr || string.IsNullOrWhiteSpace(versionStr))
+                            {
+                                return "Unity version cannot be empty.";
+                            }
+
+                            try
+                            {
+                                var targetVersion = new UnityVersion(versionStr);
+                                var minSupportedVersion = new UnityVersion("2021.1.0");
+
+                                if (targetVersion.ToUInt64() < minSupportedVersion.ToUInt64())
+                                {
+                                    return $"Unity versions below 2021 ({versionStr}) are not supported for migration. Data will not survive or parse correctly.";
+                                }
+
+                                return null;
+                            }
+                            catch (Exception ex)
+                            {
+                                return $"Invalid Unity version format: {ex.Message}";
+                            }
+                        }
+                    }
+                };
+
+                var results = OptionSelectorWindow.Ask(null,
+                    "Migration Window",
+                    opsnParam
+                );
+
+                if (results == null)
+                {
+                    NotificationManager.Warning("User clicked Cancel or pressed Escape.");
+                    return;
+                }
+
+                bool confirm = ConfirmationDialog.Show("Are u sure?",
+                    $"Format Version: {results["formatVersion"]}\n" +
+                    $"Unity Engine Version: {results["unityVersion"]}");
+
+                if (confirm)
+                {
+                    if (results["formatVersion"] is double d && results["unityVersion"] is string engineVersion)
+                    {
+                        MigrateAssetFile(inst, engineVersion, (uint)d);
+                    }
+                    break;
+                }
+            }
+        }
+
+        private void MigrateAssetFile(AssetsFileInstance inst, string engineVersion, uint formatVersion)
+        {
+            var conts = workspace.GetAssetContainersFrom(inst);
+
+            var cloned = new Dictionary<long, AssetTypeValueField>();
+            foreach (var cont in conts)
+            {
+                try
+                {
+                    var bf = cont.HasValueField ? cont.BaseValueField : workspace.GetBaseField(cont);
+                    if (bf != null) cloned[cont.PathId] = bf.Clone();
+                }
+                catch (Exception ex)
+                {
+                    Status.Write($"[Cloning] PathID {cont.PathId}: {ex.Message}", StatusType.Warning);
+                }
+            }
+
+            if (cloned.Count != conts.Count)
+            {
+                Status.Write($"[Migration] {conts.Count - cloned.Count} asset(s) read nahi hue, migration aborted.", StatusType.Error);
+                return;
+            }
+
+            ClassDatabaseFile targetCldb = am.LoadClassDatabaseFromPackage(engineVersion);
+            if (targetCldb == null) { Status.Write("[Migration] cldb not found", StatusType.Error); return; }
+
+            var amm = new AssetMigrationManager();
+            var reports = new List<MigrationReport>();
+            var results = new Dictionary<AssetContainer, byte[]>();
+
+            foreach (var cont in conts)
+            {
+                try
+                {
+                    var (res, report) = amm.ProcessMigration(cloned[cont.PathId], cont.TypeId, targetCldb);
+                    if (report != null) reports.Add(report);
+                    results[cont] = res.WriteToByteArray();
+                }
+                catch (Exception ex)
+                {
+                    Status.Write($"[Migration] PathID {cont.PathId} failed: {ex.Message}", StatusType.Error);
+                    return;
+                }
+            }
+
+            // STEP 3: Ab header + typetree badlo
+            inst.file.Header.Version = formatVersion;
+            inst.file.Metadata.UnityVersion = engineVersion;
+
+            if (inst.file.Metadata.TypeTreeEnabled)
+            {
+                var types = inst.file.Metadata.TypeTreeTypes;
+                for (int i = 0; i < types.Count; i++)
+                {
+                    var old = types[i];
+                    if (old.TypeId == (int)AssetClassID.MonoBehaviour || old.TypeId < 0) continue; // mono ko mat chhedo
+                    var nt = ClassDatabaseToTypeTree.Convert(targetCldb, old.TypeId);
+                    if (nt != null) types[i] = nt;
+                }
+            }
+
+            AssetNameUtils.ClearTemplateCache(inst);
+
+            foreach (var (cont, bytes) in results)
+                workspace.AddOrUpdateAsset(cont, bytes);
+
+            try
+            {
+                var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                string jsonReport = JsonSerializer.Serialize(reports, jsonOptions);
+
+                string reportFileName = $"MigrationReport_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+                string reportPath = Path.Combine(workspace.TempFilesDirectory, "Logs", reportFileName);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(reportPath));
+                File.WriteAllText(reportPath, jsonReport);
+
+                Status.Write($"[Migration Complete] Success: , Failed: . Report saved to: {reportFileName}", StatusType.Success);
+            }
+            catch (Exception ex)
+            {
+                Status.Write($"[Migration Report Error] Failed to save JSON report: {ex.Message}", StatusType.Warning);
+            }
+        }
+
+#endif
     }
 }

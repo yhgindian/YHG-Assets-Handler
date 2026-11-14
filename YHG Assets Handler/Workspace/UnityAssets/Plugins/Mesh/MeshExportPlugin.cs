@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YHG_Assets_Handler.Models;
 using YHG_Assets_Handler.Utils.Unity;
+using YHG_Assets_Handler.Views.Windows;
 using YHG_Assets_Handler.Workspace.UnityAssets;
 using YHG_Assets_Handler.Workspace.UnityAssets.Classes.Mesh;
 
@@ -47,18 +48,40 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Mesh
                 return;
             }
 
+            // Ask the user once (applies to every selected mesh)
+            var options = AskExportOptions();
+            if (options == null) return;
+
             if (validAssets.Count == 1)
-            {
-                await SingleExportAsync(workspace, validAssets[0]);
-            }
+                await SingleExportAsync(workspace, validAssets[0], options);
             else
+                await BatchExportAsync(workspace, validAssets, options);
+        }
+
+        private MeshExportOptions? AskExportOptions()
+        {
+            var pFlipX = new OptionParam("flipX", "Invert X axis (Unity -> Right-handed)", OptionKind.Bool, true,
+                "Keep this enabled for Blender, glTF, and OBJ exports. Triangle winding is corrected automatically as well.");
+            var pFlipV = new OptionParam("flipV", "Flip V (UV vertical)", OptionKind.Bool, true,
+                "Applies to all UV channels (UV0–UV7). If the texture appears flipped in Blender, try turning this OFF.");
+            var pSplit = new OptionParam("split", "Each submesh as separate object", OptionKind.Bool, false,
+                "OFF = A single object with multiple materials.");
+
+            var res = OptionSelectorWindow.Ask(null, "Export Mesh Options",
+                new List<OptionParam> { pFlipX, pFlipV, pSplit },
+                "Note: OBJ supports UV0 only. For UV1–UV7 support, use GLB / GLTF.");
+            if (res == null) return null;
+
+            return new MeshExportOptions
             {
-                await BatchExportAsync(workspace, validAssets);
-            }
+                FlipX = res["flipX"] is bool x && x,
+                FlipV = res["flipV"] is bool v && v,
+                SplitSubmeshesAsObjects = res["split"] is bool s && s
+            };
         }
 
         #region Single Export
-        private async Task SingleExportAsync(UnityAssetWorkspace workspace, UnityAssetObjectModel assetModel)
+        private async Task SingleExportAsync(UnityAssetWorkspace workspace, UnityAssetObjectModel assetModel, MeshExportOptions options)
         {
             var cont = assetModel.assetContainer;
             if (cont?.FileInstance == null) return;
@@ -93,21 +116,19 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Mesh
                     var meshFile = new MeshFile(new UnityVersion(unityVersion), meshField);
 
                     h.Report(50, $"Exporting via Assimp ({detectedExt.ToUpper()})...");
-                    ExportMeshDispatch(meshFile, detectedExt, exportPath);
+                    ExportMeshDispatch(meshFile, detectedExt, exportPath, options);
 
                     h.Report(100, "Export completed.");
                 }, h.Token);
             });
 
             if (ok)
-            {
                 NotificationManager.Success(assetModel.Name, $"Exported successfully as {detectedExt.ToUpper()}");
-            }
         }
         #endregion
 
         #region Batch Export
-        private async Task BatchExportAsync(UnityAssetWorkspace workspace, List<UnityAssetObjectModel> assets)
+        private async Task BatchExportAsync(UnityAssetWorkspace workspace, List<UnityAssetObjectModel> assets, MeshExportOptions options)
         {
             var dirDlg = new OpenFolderDialog
             {
@@ -161,7 +182,7 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Mesh
                             if (string.IsNullOrWhiteSpace(cleanName)) cleanName = $"Mesh_{cont.PathId}";
 
                             string filePath = Path.Combine(targetFolder, $"{cleanName}.{extension}");
-                            ExportMeshDispatch(meshFile, extension, filePath);
+                            ExportMeshDispatch(meshFile, extension, filePath, options);
                             exported++;
                         }
                         catch (Exception ex)
@@ -176,22 +197,14 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Mesh
             });
 
             if (errors.Length > 0)
-            {
                 Status.Write(errors.ToString(), StatusType.Warning);
-            }
 
             if (!ok)
-            {
                 NotificationManager.Warning($"Export cancelled after {exported}/{total} meshes.", "Mesh Export");
-            }
             else if (failed == 0)
-            {
                 NotificationManager.Success($"Exported {exported}/{total} meshes successfully.", "Batch Mesh Export");
-            }
             else
-            {
                 NotificationManager.Warning($"{exported} exported, {failed} failed. See status log.", "Batch Mesh Export");
-            }
         }
         #endregion
 
@@ -208,14 +221,12 @@ namespace YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Mesh
             return cont.BaseValueField;
         }
 
-        private static void ExportMeshDispatch(MeshFile meshFile, string formatExtension, string targetPath)
+        private static void ExportMeshDispatch(MeshFile meshFile, string formatExtension, string targetPath, MeshExportOptions options)
         {
             if (formatExtension == "fbx")
-            {
                 throw new NotImplementedException("Autodesk FBX export will run through the native pipeline.");
-            }
 
-            meshFile.ExportWithAssimp(targetPath, formatExtension);
+            meshFile.ExportWithAssimp(targetPath, formatExtension, options);
         }
 
         private static string GetExtensionForFormat(MeshExportFormat format)

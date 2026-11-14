@@ -43,6 +43,7 @@ namespace YHG_Assets_Handler.ViewModels
                 LoadFileDirectly(defaultPath);
                 LoadFileDirectly(@"D:\Downloads\Edit\Editors\obb\V4.6\Data\e24cbc9c5348ecd4bafe1745dd04dd41");
                 LoadFileDirectly(@"D:\Downloads\Edit\Editors\obb\V4.6\YHGIndian\maps\sumatera\2006546\2006546\assets\assetpack\sumatera");
+            LoadFileDirectly(@"D:\Downloads\YHGINDAIN\Working\e24cbc9c5348ecd4bafe1745dd04dd41");
             
 #endif
         }
@@ -525,6 +526,17 @@ namespace YHG_Assets_Handler.ViewModels
         private void Donation()
         {
             WindowHelper.ShowSingle<DonationWindow>();
+        }
+
+        [RelayCommand]
+        private async Task Migration()
+        {
+#if DEBUG
+            if (TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
+                await vm.MigrateAssetFile();
+#else
+            NotificationManager.Warning("This feature is not yet available in the public release.");
+#endif
         }
     }
 }

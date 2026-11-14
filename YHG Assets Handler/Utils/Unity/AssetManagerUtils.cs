@@ -17,19 +17,13 @@ namespace YHG_Assets_Handler.Utils.Unity
         public static AssetTypeTemplateField CreateTemplateField(
             this AssetsManager am, int classid)
         {
-            ClassDatabaseType cldbType =
-                am.ClassDatabase.FindAssetClassByID(classid);
-
-            var tempField = new AssetTypeTemplateField();
-            tempField.FromClassDatabase(am.ClassDatabase, cldbType);
-            return tempField;
+            return am.ClassDatabase.CreateTemplateField(classid);
         }
 
         public static AssetTypeValueField CreateEmptyBaseField(
             this AssetsManager am, int classid)
         {
-            var tempField = am.CreateTemplateField(classid);
-            return ValueBuilder.DefaultValueFieldFromTemplate(tempField);
+            return am.ClassDatabase.CreateEmptyBaseField(classid);
         }
 
         private const BindingFlags PrivateInstance =
@@ -68,7 +62,6 @@ namespace YHG_Assets_Handler.Utils.Unity
                     return;
                 }
 
-                // 2. Fallback: Internal _dict extraction
                 Status.Write("[MonoCache] Direct Remove not found, falling back to internal _dict...");
                 var innerDictField = cacheObj.GetType().GetField("_dict", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (innerDictField != null)

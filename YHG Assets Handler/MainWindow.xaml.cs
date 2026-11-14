@@ -12,6 +12,7 @@ using YHG_Assets_Handler.Models;
 using YHG_Assets_Handler.Models.Host;
 using YHG_Assets_Handler.ViewModels;
 using YHG_Assets_Handler.Views.Windows;
+using YHG_Assets_Handler.Views.Windows.Updater;
 using YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Texture2D;
 
 namespace YHG_Assets_Handler
@@ -54,7 +55,33 @@ namespace YHG_Assets_Handler
                 return false;
             };
             this.DataContext = new ViewModels.MainViewModel();
+
+            this.Loaded += MainWindow_Loaded;
+
         }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await UpdateCheckerAsync();
+        }
+
+        private async Task UpdateCheckerAsync()
+        {
+            var result = await UpdateHelper.IsUpdateAvailableAsync();
+
+            if (result.IsNew)
+            {
+                NotificationManager.Warning(
+                    message: "A newer version is available. Please download it.",
+                    durationMs: 0,
+                    onClick: () =>
+                    {
+                        Updater updater = new();
+                        updater.ShowDialog();
+                    });
+            }
+        }
+
         private async void MainWindow_Closing(object? sender, CancelEventArgs e)
         {
             if (_isClosingConfirmed)
@@ -254,6 +281,8 @@ namespace YHG_Assets_Handler
         }
 
 #endif
+
+
         private void ProcessManager_ProcessFinished(ProcessItem obj)
         {
             RefreshTaskItem();
@@ -325,6 +354,7 @@ namespace YHG_Assets_Handler
                 e.Effects = DragDropEffects.None;
             }
         }
+
         private void solution_ex_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))

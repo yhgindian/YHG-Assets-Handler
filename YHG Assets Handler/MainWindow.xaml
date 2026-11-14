@@ -186,6 +186,12 @@
                     InputGestureText="Ctrl+Shift+F"
                     VisibleFor="UnityAsset"
                     VisibleSource="{Binding CurrentExplorerItem.FileType}" />
+                <DarkMenuItem_01
+                    Command="{Binding MigrationCommand}"
+                    Header="Migration"
+                    IconKind="FileArrowLeftRight"
+                    VisibleFor="UnityAsset"
+                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
             </DarkMenuItem_01>
             <DarkMenuItem_01 Header="_Tools">
                 <DarkMenuItem_01
