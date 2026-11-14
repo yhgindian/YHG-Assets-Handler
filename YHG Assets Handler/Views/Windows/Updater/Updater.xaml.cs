@@ -24,7 +24,7 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
         {
             InitializeComponent();
 
-            currentVer = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+            currentVer = UpdateHelper.GetCurrentVersion(); ;
             lblVersionInfo.Text = $"Current: v{currentVer}";
 
             UpdateHelper.VerifyUpdateLifecycle(currentVer);
@@ -81,7 +81,7 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
                 btnAction.IsEnabled = false;
                 lblStatus.Text = "SYSTEM: Querying GitHub repository...";
 
-                lastCheckResult = await helper.IsUpdateAvailableAsync(currentVer);
+                lastCheckResult = await UpdateHelper.IsUpdateAvailableAsync(currentVer);
 
                 if (lastCheckResult.IsNew)
                 {
@@ -148,7 +148,7 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
             {
                 if (lastCheckResult == null)
                 {
-                    lastCheckResult = await helper.IsUpdateAvailableAsync(currentVer);
+                    lastCheckResult = await UpdateHelper.IsUpdateAvailableAsync(currentVer);
                 }
 
                 // Determine selected asset package
@@ -184,7 +184,7 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
                     progressBar1.Visibility = Visibility.Visible;
                     currentState = UpdateState.Downloading;
 
-                    bool success = await helper.DownloadUpdateAsync(selectedPkg.DownloadUrl, savePath, (progress) =>
+                    bool success = await UpdateHelper.DownloadUpdateAsync(selectedPkg.DownloadUrl, savePath, (progress) =>
                     {
                         Dispatcher.Invoke(() =>
                         {

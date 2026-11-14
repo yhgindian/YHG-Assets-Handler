@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
@@ -105,20 +106,31 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
             }
         }
 
-        public async Task<UpdateCheckResult> IsUpdateAvailableAsync(string currentVersion)
+
+        public static Task<UpdateCheckResult> IsUpdateAvailableAsync()
+        {
+            return IsUpdateAvailableAsync(GetCurrentVersion());
+        }
+
+        public static async Task<UpdateCheckResult> IsUpdateAvailableAsync(string currentVersion)
         {
             var result = new UpdateCheckResult();
+
             try
             {
                 var response = await client.GetStringAsync(API_URL);
+
                 using var doc = JsonDocument.Parse(response);
                 var root = doc.RootElement;
 
                 string latestTag = root.GetProperty("tag_name").GetString() ?? "1.0.0";
-                result.Version = latestTag;
-                result.Changelog = root.GetProperty("body").GetString() ?? "No changelog provided.";
 
-                if (root.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
+                result.Version = latestTag;
+                result.Changelog = root.GetProperty("body").GetString()
+                    ?? "No changelog provided.";
+
+                if (root.TryGetProperty("assets", out var assets) &&
+                    assets.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var asset in assets.EnumerateArray())
                     {
@@ -126,19 +138,24 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
                         string downloadUrl = asset.GetProperty("browser_download_url").GetString() ?? "";
                         long size = asset.GetProperty("size").GetInt64();
 
+                        var package = new ReleasePackage
+                        {
+                            Name = name,
+                            DownloadUrl = downloadUrl,
+                            SizeInBytes = size
+                        };
+
                         if (name.Contains("Standalone", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result.StandalonePackage = new ReleasePackage { Name = name, DownloadUrl = downloadUrl, SizeInBytes = size };
-                        }
+                            result.StandalonePackage = package;
+
                         else if (name.Contains("Lightweight", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result.LightweightPackage = new ReleasePackage { Name = name, DownloadUrl = downloadUrl, SizeInBytes = size };
-                        }
+                            result.LightweightPackage = package;
                     }
                 }
 
-                Version current = new Version(currentVersion.Replace("v", "").Trim());
-                Version latest = new Version(latestTag.Replace("v", "").Trim());
+                Version current = new Version(currentVersion.TrimStart('v', 'V').Trim());
+                Version latest = new Version(latestTag.TrimStart('v', 'V').Trim());
+
                 result.IsNew = latest > current;
 
                 return result;
@@ -147,11 +164,13 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
             {
                 result.IsNew = false;
                 result.Changelog = "Failed to establish network pipeline with GitHub API.";
+
                 return result;
             }
         }
 
-        public async Task<bool> DownloadUpdateAsync(string url, string savePath, Action<int> progressCallback)
+
+        public static async Task<bool> DownloadUpdateAsync(string url, string savePath, Action<int> progressCallback)
         {
             try
             {
@@ -185,5 +204,7 @@ namespace YHG_Assets_Handler.Views.Windows.Updater
                 return false;
             }
         }
+
+        public static string GetCurrentVersion() => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
     }
 }
