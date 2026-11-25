@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Generic plugin build output (host's plugins-out/ convention) and each plugin's own native
+# build staging folder (native-out/) - these hold compiled/deployed DLLs (managed + native,
+# e.g. BussidCore.dll) that get pushed to the server, never source - don't commit them.
+plugins-out/
+**/native-out/
