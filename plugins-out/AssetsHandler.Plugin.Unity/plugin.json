@@ -1,7 +1,0 @@
-{
-  "id": "yhg.unity",
-  "name": "Unity Assets",
-  "version": "1.0.0",
-  "entryAssembly": "AssetsHandler.Plugin.Unity.dll",
-  "minHostApiVersion": 1
-}
