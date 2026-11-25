@@ -20,6 +20,14 @@ public sealed class MenuContribution
     public required MenuLocation Location { get; init; }
     public required string Header { get; init; }
 
+    /// <summary>
+    /// Optional nested submenu path under <see cref="Location"/>, dot- or slash-separated,
+    /// e.g. "Bussid" or "Bussid.Export". The host creates any missing submenu levels on the
+    /// fly, so plugins never need the root menu (View/Tools) to already contain their group.
+    /// Leave null to put the item directly under the root menu.
+    /// </summary>
+    public string? Path { get; init; }
+
     /// <summary>Menu entries are sorted by Order, then registration order.</summary>
     public int Order { get; init; } = 0;
     public string IconKind { get; init; } = "None";

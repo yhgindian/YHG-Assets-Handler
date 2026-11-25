@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
@@ -45,15 +45,27 @@
 
 	<!--
 		Generic plugin deployment (host knows no plugin by name):
-		1. builds every project found under <repo>\plugins\*\*.csproj
+		1. builds every project found under <repo>\plugins\*\*.csproj (and $(YhgExtraPluginsDir)\*\*.csproj if set)
 		2. copies <repo>\plugins-out\** into <OutDir>\plugins\ (F5 / Build) and <PublishDir>\plugins\ (Publish)
 	-->
 	<ItemGroup>
 		<_PluginProject Include="$(MSBuildThisFileDirectory)..\plugins\*\*.csproj" />
+		<!-- Optional: a second plugins folder (e.g. from a private repo). Set YhgExtraPluginsDir in a Directory.Build.props or on the command line. -->
+		<_PluginProject Include="$(YhgExtraPluginsDir)\*\*.csproj" Condition="'$(YhgExtraPluginsDir)' != ''" />
 	</ItemGroup>
 
+	<!--
+		Plugins are built as plain framework-dependent AnyCPU libraries. Publish passes RuntimeIdentifier / SelfContained /
+		PublishSingleFile ... as GLOBAL properties, which would otherwise flow into these builds and fail
+		("project.assets.json doesn't have a target for net10.0-windows/win-x64"), so they are removed here.
+	-->
+	<PropertyGroup>
+		<_PluginRemoveProps>RuntimeIdentifier;RuntimeIdentifiers;SelfContained;PublishSingleFile;PublishReadyToRun;PublishTrimmed;PublishAot;PublishDir;PublishProfile;_IsPublishing;NoBuild;OutDir;OutputPath;IntermediateOutputPath;TargetFramework;TargetFrameworks</_PluginRemoveProps>
+	</PropertyGroup>
+
+	<!-- Separate dotnet process = completely clean property set (no RID / SelfContained / SingleFile leaking from Publish). -->
 	<Target Name="BuildPlugins" AfterTargets="Build" Condition="'@(_PluginProject)' != ''">
-		<MSBuild Projects="@(_PluginProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+		<Exec Command="dotnet build &quot;%(_PluginProject.FullPath)&quot; -c $(Configuration) -nologo -v:minimal" />
 	</Target>
 
 	<Target Name="CopyPluginsToOutput" AfterTargets="BuildPlugins">

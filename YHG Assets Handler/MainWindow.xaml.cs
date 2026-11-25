@@ -81,8 +81,12 @@ namespace YHG_Assets_Handler
 
                 foreach (var (c, _) in items)
                 {
-                    if (c.SeparatorBefore && menu.Items.Count > 0)
-                        menu.Items.Add(new Separator());
+                    // Walk/create any nested submenu levels requested via MenuContribution.Path
+                    // (e.g. Path = "Bussid" or "Bussid.Export") under the root menu (View/Tools).
+                    var host = GetOrCreateSubmenu(menu, c.Path);
+
+                    if (c.SeparatorBefore && host.Items.Count > 0)
+                        host.Items.Add(new Separator());
 
                     var cmd = vm.CreatePluginCommand(c);
                     var mi = new DarkMenuItem_01
@@ -102,7 +106,7 @@ namespace YHG_Assets_Handler
                             new Binding("CurrentExplorerItem.Format") { Source = vm });
                     }
 
-                    menu.Items.Add(mi);
+                    host.Items.Add(mi);
 
                     if (!string.IsNullOrWhiteSpace(c.Gesture))
                     {
@@ -115,6 +119,33 @@ namespace YHG_Assets_Handler
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Finds (or creates, in order) the nested <see cref="DarkMenuItem_01"/> chain described by
+        /// a dot- or slash-separated path (e.g. "Bussid.Export") directly under <paramref name="root"/>.
+        /// Two plugins contributing to the same path share the same submenu. Null/empty path returns root.
+        /// </summary>
+        private static DarkMenuItem_01 GetOrCreateSubmenu(DarkMenuItem_01 root, string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return root;
+
+            var current = root;
+            foreach (var segment in path.Split(new[] { '.', '/' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var existing = current.Items.OfType<DarkMenuItem_01>()
+                    .FirstOrDefault(x => string.Equals(x.Header as string, segment, StringComparison.OrdinalIgnoreCase));
+
+                if (existing is null)
+                {
+                    existing = new DarkMenuItem_01 { Header = segment };
+                    current.Items.Add(existing);
+                }
+
+                current = existing;
+            }
+
+            return current;
         }
 
         private void AddPluginManagerMenuItem(ViewModels.MainViewModel vm)

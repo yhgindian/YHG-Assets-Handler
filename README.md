@@ -7,7 +7,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
 [![Architecture](https://img.shields.io/badge/Architecture-x64-555555?style=for-the-badge)](#system-requirements)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 <br>
 
@@ -40,6 +40,8 @@ A dedicated native workspace engineered for Unity `.assets` files and AssetBundl
 **YHG Assets Handler** is a modular Windows desktop utility designed for inspecting, extracting, editing, and repacking assets within Unity AssetBundles and raw serialized container files (`.assets`).
 
 Built with modern **.NET 10** and native hardware-accelerated interfaces, it bridges low-level asset parsing with a responsive workspace tailored for game developers, technical artists, and modding engineers.
+
+The application itself is format-agnostic: every supported file format is provided by a **plugin** (Unity support ships as the bundled `yhg.unity` plugin).
 
 ---
 
@@ -111,6 +113,16 @@ Read typetrees, class IDs, memory offsets, and container headers directly withou
 </td>
 </tr>
 </table>
+
+---
+
+## Plugins
+
+Formats, inspectors and menu entries are contributed by plugins that live in the `plugins` folder next to the executable.
+
+- **Plugin Manager** (`Tools > Plugin Manager...`): install a plugin from a `.zip`, enable / disable, uninstall and see load status. Changes are applied on the next start.
+- **Build your own**: the plugin API is the small `PluginAbstractions` project. See [PLUGIN_GUIDE.md](PLUGIN_GUIDE.md) for the API, the project template and packaging.
+- Plugins run inside the application process with full user permissions. Only install plugins from sources you trust.
 
 ---
 
@@ -194,11 +206,9 @@ If you find YHG Assets Handler useful for your workflow, consider supporting dev
 
 ## License
 
-**YHG Assets Handler** is proprietary software.
+**YHG Assets Handler** is released under the [MIT License](LICENSE).
 
-The application and its core proprietary components are protected by international copyright laws. Unauthorized redistribution, modification, decompilation, or reverse engineering is strictly prohibited except where explicitly permitted by law.
-
-Third-party dependencies and submodules bundled within the distribution remain governed by their respective open-source licenses.
+Third-party dependencies remain governed by their respective licenses (see the table above); components with their own terms, such as PVRTexLib, are not covered by the MIT license of this project. Plugins are separate works and may use their own licenses.
 
 ---
 

@@ -19,7 +19,7 @@ namespace AssetsHandler.Plugin.Unity
             Version = "1.0.0",
             Author = "YHGIndian",
             Credits = "AssetsTools.NET (nesrak1), AssimpNet, Fmod5Sharp, HelixToolkit, StbImageSharp, TagLibSharp",
-            License = "GPL-3.0",
+            License = "MIT",
             Description = "Inspect and edit Unity AssetBundles (UnityFS) and serialized .assets files.",
             MinHostApiVersion = 1
         };
