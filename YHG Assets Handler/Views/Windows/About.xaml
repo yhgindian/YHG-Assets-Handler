@@ -93,7 +93,7 @@
                             FontSize="13"
                             Foreground="#C8C8CE"
                             LineHeight="21"
-                            Text="YHG Assets Handler is a developer-oriented utility designed to handle Unity AssetBundle files and serialized .assets files. It provides advanced asset inspection and processing capabilities to simplify various modding workflows."
+                            Text="YHG Assets Handler is a modular, plugin-based utility for inspecting and editing game asset files. Each supported format is provided by a plugin, which keeps the core small and lets new games and formats be added without changing the app."
                             TextWrapping="Wrap" />
 
                         <TextBlock
@@ -237,67 +237,37 @@
 
                         <StackPanel>
 
-                            <!--  AssetsTools.NET  -->
+                            <!--  Plugins  -->
                             <StackPanel Margin="0,0,0,17">
                                 <TextBlock
                                     FontSize="13"
                                     FontWeight="SemiBold"
                                     Foreground="#E6E6EA"
-                                    Text="AssetsTools.NET" />
+                                    Text="Installed plugins" />
+                                <ItemsControl x:Name="PluginList" Margin="0,6,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="0,0,0,8">
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="#E6E6EA"
+                                                    Text="{Binding Title, Mode=OneWay}" />
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    Foreground="#8A8A93"
+                                                    Text="{Binding Details, Mode=OneWay}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                                 <TextBlock
-                                    Margin="0,3,0,4"
+                                    x:Name="NoPluginsText"
                                     FontSize="11"
                                     Foreground="#8A8A93"
-                                    Text="Unity asset file handling" />
-                                <TextBlock
-                                    FontSize="10"
-                                    Foreground="#4EC9B0"
-                                    Text="MIT License" />
-                                <TextBlock>
-                                    <Hyperlink
-                                        Foreground="#00D2FF"
-                                        NavigateUri="https://github.com/nesrak1/AssetsTools.NET"
-                                        RequestNavigate="OpenLink_RequestNavigate">
-                                        GitHub Repository
-                                    </Hyperlink>
-                                </TextBlock>
+                                    Text="No plugins loaded."
+                                    Visibility="Collapsed" />
                             </StackPanel>
-
-                            <Border
-                                Height="1"
-                                Margin="0,0,0,15"
-                                Background="#2A2A31" />
-
-                            <!--  AssimpNet  -->
-                            <StackPanel Margin="0,0,0,17">
-                                <TextBlock
-                                    FontSize="13"
-                                    FontWeight="SemiBold"
-                                    Foreground="#E6E6EA"
-                                    Text="AssimpNet" />
-                                <TextBlock
-                                    Margin="0,3,0,4"
-                                    FontSize="11"
-                                    Foreground="#8A8A93"
-                                    Text="3D model importing" />
-                                <TextBlock
-                                    FontSize="10"
-                                    Foreground="#4EC9B0"
-                                    Text="MIT / BSD-3-Clause (native Assimp)" />
-                                <TextBlock>
-                                    <Hyperlink
-                                        Foreground="#00D2FF"
-                                        NavigateUri="https://github.com/MonoGame/AssimpNet"
-                                        RequestNavigate="OpenLink_RequestNavigate">
-                                        GitHub Repository
-                                    </Hyperlink>
-                                </TextBlock>
-                            </StackPanel>
-
-                            <Border
-                                Height="1"
-                                Margin="0,0,0,15"
-                                Background="#2A2A31" />
 
                             <!--  CommunityToolkit  -->
                             <StackPanel Margin="0,0,0,17">

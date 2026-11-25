@@ -41,5 +41,8 @@
 
         <!--  ListBox  -->
         <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/ListBox/DarkListBox_01.xaml" />
+
+        <!--  TabControl  -->
+        <ResourceDictionary Source="/AssetsHandler.Controls;component/Themes/TabControl/DarkTabControl_01.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿using YHG_Assets_Handler.Models;
+﻿using PluginAbstractions;
 
 namespace YHG_Assets_Handler.ViewModels
 {

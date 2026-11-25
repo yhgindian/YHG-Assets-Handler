@@ -23,6 +23,24 @@ namespace YHG_Assets_Handler.Views.Windows
         public About()
         {
             InitializeComponent();
+
+            var loaded = YHG_Assets_Handler.Plugins.PluginManager.Instance.Results
+                .Where(r => r.Status == YHG_Assets_Handler.Plugins.PluginStatus.Loaded && r.Info != null)
+                .Select(r => r.Info!)
+                .Select(i => new
+                {
+                    Title = $"{i.Name}  v{i.Version}",
+                    Details = string.Join("  ·  ", new[]
+                    {
+                        i.Author,
+                        string.IsNullOrWhiteSpace(i.License) ? "" : "License: " + i.License,
+                        string.IsNullOrWhiteSpace(i.Credits) ? "" : "Credits: " + i.Credits
+                    }.Where(x => !string.IsNullOrWhiteSpace(x)))
+                })
+                .ToList();
+
+            PluginList.ItemsSource = loaded;
+            NoPluginsText.Visibility = loaded.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

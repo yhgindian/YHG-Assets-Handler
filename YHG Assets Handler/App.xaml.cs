@@ -29,6 +29,21 @@ namespace YHG_Assets_Handler
                 new MouseWheelEventHandler(TreeViewItem_PreviewMouseWheel));
         }
 
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            // Plugins first (they register formats/views/menus), then the window that consumes them.
+            PluginAbstractions.Dialogs.Current = new Models.Host.DialogService();
+            PluginAbstractions.ExplorerItem.FormatResolver = Plugins.PluginManager.Instance.Detect;
+            Plugins.PluginManager.Instance.LoadAll();
+
+            new MainWindow().Show();
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Plugins.PluginManager.Instance.ShutdownAll();
+        }
+
         private void OnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
         {
             e.Handled = true;

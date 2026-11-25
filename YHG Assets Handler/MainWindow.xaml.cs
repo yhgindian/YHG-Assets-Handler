@@ -1,19 +1,20 @@
 ﻿using AssetsHandler.Controls;
-using AssetsHandler.Core.ProcessManager;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using YHG_Assets_Handler.Models;
+using MahApps.Metro.IconPacks;
+using PluginAbstractions;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using YHG_Assets_Handler.Plugins;
 using YHG_Assets_Handler.Models.Host;
 using YHG_Assets_Handler.ViewModels;
 using YHG_Assets_Handler.Views.Windows;
 using YHG_Assets_Handler.Views.Windows.Updater;
-using YHG_Assets_Handler.Workspace.UnityAssets.Plugins.Texture2D;
 
 namespace YHG_Assets_Handler
 {
@@ -54,10 +55,100 @@ namespace YHG_Assets_Handler
                 if (n.HasClickAction) return true;
                 return false;
             };
-            this.DataContext = new ViewModels.MainViewModel();
+            var mainVm = new ViewModels.MainViewModel();
+            this.DataContext = mainVm;
+            BuildPluginMenus(mainVm);
+            AddPluginManagerMenuItem(mainVm);
 
             this.Loaded += MainWindow_Loaded;
 
+        }
+
+        // ───────────── Plugin menus ─────────────
+
+        private void BuildPluginMenus(ViewModels.MainViewModel vm)
+        {
+            foreach (var (location, menu) in new[] { (MenuLocation.View, ViewMenu), (MenuLocation.Tools, ToolsMenu) })
+            {
+                var items = PluginManager.Instance.Menus
+                    .Where(m => m.Menu.Location == location)
+                    .Select((m, i) => (m.Menu, Index: i))
+                    .OrderBy(x => x.Menu.Order).ThenBy(x => x.Index)
+                    .ToList();
+
+                if (items.Count == 0) continue;
+                menu.Visibility = Visibility.Visible;
+
+                foreach (var (c, _) in items)
+                {
+                    if (c.SeparatorBefore && menu.Items.Count > 0)
+                        menu.Items.Add(new Separator());
+
+                    var cmd = vm.CreatePluginCommand(c);
+                    var mi = new DarkMenuItem_01
+                    {
+                        Header = c.Header,
+                        Command = cmd,
+                        InputGestureText = c.InputGestureText ?? c.Gesture
+                    };
+
+                    if (Enum.TryParse<PackIconMaterialKind>(c.IconKind, out var kind))
+                        mi.IconKind = kind;
+
+                    if (c.VisibleForFormats is { Count: > 0 })
+                    {
+                        mi.VisibleFor = string.Join(",", c.VisibleForFormats.Select(f => f.Value));
+                        mi.SetBinding(DarkMenuItem_01.VisibleSourceProperty,
+                            new Binding("CurrentExplorerItem.Format") { Source = vm });
+                    }
+
+                    menu.Items.Add(mi);
+
+                    if (!string.IsNullOrWhiteSpace(c.Gesture))
+                    {
+                        try
+                        {
+                            var g = (KeyGesture)new KeyGestureConverter().ConvertFromInvariantString(c.Gesture)!;
+                            InputBindings.Add(new KeyBinding(cmd, g));
+                        }
+                        catch { /* invalid gesture string from a plugin: ignore */ }
+                    }
+                }
+            }
+        }
+
+        private void AddPluginManagerMenuItem(ViewModels.MainViewModel vm)
+        {
+            ToolsMenu.Visibility = Visibility.Visible;
+            if (ToolsMenu.Items.Count > 0) ToolsMenu.Items.Add(new Separator());
+            ToolsMenu.Items.Add(new DarkMenuItem_01
+            {
+                Header = "Plugin Manager...",
+                IconKind = PackIconMaterialKind.Puzzle,
+                Command = vm.OpenPluginManagerCommand
+            });
+        }
+
+        // ───────────── Restart (used by Plugin Manager) ─────────────
+
+        private bool _restartRequested;
+
+        /// <summary>Closes through the normal flow (unsaved-changes prompt etc.) and starts a new instance afterwards.</summary>
+        public void RequestRestart()
+        {
+            _restartRequested = true;
+            Close();
+        }
+
+        private static void StartNewInstance()
+        {
+            try
+            {
+                string? exe = Environment.ProcessPath;
+                if (!string.IsNullOrEmpty(exe))
+                    Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true });
+            }
+            catch { }
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -89,6 +180,7 @@ namespace YHG_Assets_Handler
             e.Cancel = true;
             if (ProcessManager.ActiveCount > 0)
             {
+                _restartRequested = false;
                 NotificationManager.Warning("Please wait for all background tasks to finish or cancel them first.", "Tasks Running");
                 return;
             }
@@ -100,10 +192,12 @@ namespace YHG_Assets_Handler
                 {
                     _isCheckingCanClose = true;
                     bool canClose = await vm.CanCloseAppAsync();
+                    if (!canClose) _restartRequested = false;
                     if (canClose)
                     {
                         vm.OnAppClosing();
                         _isClosingConfirmed = true;
+                        if (_restartRequested) StartNewInstance();
                         _ = Dispatcher.InvokeAsync(Close, System.Windows.Threading.DispatcherPriority.Background);
                     }
                 }
@@ -127,7 +221,7 @@ namespace YHG_Assets_Handler
         },
         new OptionParam("blockDirAtEnd", "Pack Directory Info at File End", OptionKind.Bool,
             defaultValue: true,
-            description: "Standard layout for UnityFS streaming engines."),
+            description: "Standard layout for streaming engines."),
         new OptionParam("stripMipmaps", "Strip Textures Mipmaps", OptionKind.Bool,
             defaultValue: false,
             description: "Removes extra LOD levels to reduce output size."),
@@ -336,7 +430,7 @@ namespace YHG_Assets_Handler
         {
             if (DataContext is ViewModels.MainViewModel vm)
             {
-                if (e.NewValue is Models.ExplorerItem selectedItem)
+                if (e.NewValue is ExplorerItem selectedItem)
                 {
                     vm.OnItemSelected(selectedItem);
                 }

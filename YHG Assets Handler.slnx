@@ -10,8 +10,12 @@
   <Project Path="AssetsHandler.Core/AssetsHandler.Core.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
+  <Project Path="PluginAbstractions/PluginAbstractions.csproj" Id="1791380b-ae5e-42a5-acfc-fc2b4f970a1b" />
+  <Project Path="plugins/AssetsHandler.Plugin.Unity/AssetsHandler.Plugin.Unity.csproj" Id="66bb7de1-c67c-4154-9f6c-4030ef61f9f5">
+    <BuildDependency Project="TexToolHelper/TexToolHelper.vcxproj" />
+  </Project>
   <Project Path="TexToolHelper/TexToolHelper.vcxproj" Id="f01527f6-0cc1-49e4-ac14-2b96a001a39d" />
   <Project Path="YHG Assets Handler/YHG Assets Handler.csproj">
-    <BuildDependency Project="TexToolHelper/TexToolHelper.vcxproj" />
+    <BuildDependency Project="plugins/AssetsHandler.Plugin.Unity/AssetsHandler.Plugin.Unity.csproj" />
   </Project>
 </Solution>

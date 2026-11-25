@@ -23,64 +23,51 @@
 	  <Page Remove="ViewModels\Tools\**" />
 	</ItemGroup>
 
+	<!-- Host has no knowledge of any plugin. Plugins are built separately and copied into <app>\plugins\<id>\ -->
 	<ItemGroup>
 		<Content Include="YHG-Assets-Handler-Logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Fmod5Sharp" Version="3.1.0" />
-		<PackageReference Include="HelixToolkit.Wpf" Version="3.1.2" />
-		<PackageReference Include="StbImageSharp" Version="2.30.16" />
-		<PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
-		<PackageReference Include="TagLibSharp" Version="2.3.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\AssetsHandler.Controls\AssetsHandler.Controls.csproj" />
 		<ProjectReference Include="..\AssetsHandler.Core\AssetsHandler.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="YHGIndian\classdata.tpk">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-		</None>
-	</ItemGroup>
-
-	<!-- 🔹 1. Native DLLs for Normal Build -->
-	<Target Name="CopyNativeLibrariesOnBuild" AfterTargets="Build">
-		<ItemGroup>
-			<NativeDlls Include="$(SolutionDir)x64\$(Configuration)\*.dll" />
-			<NativeDlls Include="$(MSBuildProjectDirectory)\..\NativeLibs\win-x64\**\*.dll" />
-			<NativeDlls Include="$(MSBuildProjectDirectory)\NativeLibs\win-x64\**\*.dll" />
-		</ItemGroup>
-		<PropertyGroup>
-			<NativeBuildDir>$(TargetDir)runtimes\win-x64\native\</NativeBuildDir>
-		</PropertyGroup>
-		<Message Importance="High" Text="[CopyNativeLibrariesOnBuild] Copying DLLs to $(NativeBuildDir)" />
-		<Copy SourceFiles="@(NativeDlls)" DestinationFolder="$(NativeBuildDir)" SkipUnchangedFiles="true" />
-	</Target>
-
-	<!-- 🔹 2. Native DLLs for Publish Only -->
-	<Target Name="CopyNativeLibrariesOnPublish" AfterTargets="Publish">
-		<ItemGroup>
-			<NativePublishDlls Include="$(SolutionDir)x64\$(Configuration)\*.dll" />
-			<NativePublishDlls Include="$(MSBuildProjectDirectory)\..\NativeLibs\win-x64\**\*.dll" />
-			<NativePublishDlls Include="$(MSBuildProjectDirectory)\NativeLibs\win-x64\**\*.dll" />
-		</ItemGroup>
-		<PropertyGroup>
-			<NativePublishDir>$(PublishDir)runtimes\win-x64\native\</NativePublishDir>
-		</PropertyGroup>
-		<Message Importance="High" Text="[CopyNativeLibrariesOnPublish] Copying DLLs to $(NativePublishDir)" />
-		<Copy SourceFiles="@(NativePublishDlls)" DestinationFolder="$(NativePublishDir)" SkipUnchangedFiles="true" />
-	</Target>
-
-	<ItemGroup>
-		<Folder Include="Editor\Core\" />
+		<ProjectReference Include="..\PluginAbstractions\PluginAbstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Resource Include="Assets\qr_code.jpeg" />
 	</ItemGroup>
+
+	<!--
+		Generic plugin deployment (host knows no plugin by name):
+		1. builds every project found under <repo>\plugins\*\*.csproj
+		2. copies <repo>\plugins-out\** into <OutDir>\plugins\ (F5 / Build) and <PublishDir>\plugins\ (Publish)
+	-->
+	<ItemGroup>
+		<_PluginProject Include="$(MSBuildThisFileDirectory)..\plugins\*\*.csproj" />
+	</ItemGroup>
+
+	<Target Name="BuildPlugins" AfterTargets="Build" Condition="'@(_PluginProject)' != ''">
+		<MSBuild Projects="@(_PluginProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+	</Target>
+
+	<Target Name="CopyPluginsToOutput" AfterTargets="BuildPlugins">
+		<ItemGroup>
+			<_PluginOutFiles Include="$(MSBuildThisFileDirectory)..\plugins-out\**\*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(_PluginOutFiles)" DestinationFiles="@(_PluginOutFiles->'$(OutDir)plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
+
+	<Target Name="CopyPluginsToPublish" AfterTargets="Publish">
+		<ItemGroup>
+			<_PluginPubFiles Include="$(MSBuildThisFileDirectory)..\plugins-out\**\*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(_PluginPubFiles)" DestinationFiles="@(_PluginPubFiles->'$(PublishDir)plugins\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
 
 </Project>

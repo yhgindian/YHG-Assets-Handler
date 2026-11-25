@@ -7,18 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using YHG_Assets_Handler.Models;
+using System.Windows.Input;
+using PluginAbstractions;
+using YHG_Assets_Handler.Plugins;
 using YHG_Assets_Handler.Views;
 using YHG_Assets_Handler.Views.Windows;
-using YHG_Assets_Handler.Views.Windows.Tools;
-using YHG_Assets_Handler.Views.Windows.Unity;
 using YHG_Assets_Handler.Views.Windows.Updater;
-using YHG_Assets_Handler.Workspace.UnityAssets;
 
 namespace YHG_Assets_Handler.ViewModels
 {
@@ -37,15 +35,48 @@ namespace YHG_Assets_Handler.ViewModels
 
         public MainViewModel()
         {
-#if DEBUG
-            string defaultPath = @"D:\Downloads\Edit\Editors\obb\V4.6\Data\368d36fb049e92a4199b78fa16cb0931";
-            
-                LoadFileDirectly(defaultPath);
-                LoadFileDirectly(@"D:\Downloads\Edit\Editors\obb\V4.6\Data\e24cbc9c5348ecd4bafe1745dd04dd41");
-                LoadFileDirectly(@"D:\Downloads\Edit\Editors\obb\V4.6\YHGIndian\maps\sumatera\2006546\2006546\assets\assetpack\sumatera");
-            LoadFileDirectly(@"D:\Downloads\YHGINDAIN\Working\e24cbc9c5348ecd4bafe1745dd04dd41");
-            
-#endif
+        }
+
+        // ───────────── Plugin menu contributions ─────────────
+
+        private readonly List<AsyncRelayCommand> _pluginCommands = new();
+
+        public MenuContext BuildMenuContext() => new()
+        {
+            CurrentItem = CurrentExplorerItem,
+            Owner = Application.Current?.MainWindow
+        };
+
+        /// <summary>Creates the command behind a plugin menu entry. Host never looks inside the plugin's action.</summary>
+        public ICommand CreatePluginCommand(MenuContribution c)
+        {
+            var cmd = new AsyncRelayCommand(
+                async () =>
+                {
+                    try
+                    {
+                        var ctx = BuildMenuContext();
+                        if (c.ExecuteAsync != null) await c.ExecuteAsync(ctx);
+                        else c.Execute?.Invoke(ctx);
+                        SaveCommand.NotifyCanExecuteChanged();
+                    }
+                    catch (Exception ex)
+                    {
+                        Status.Write($"{c.Header.Replace("_", "")} failed: {ex.Message}", StatusType.Error);
+                    }
+                },
+                () =>
+                {
+                    try { return c.CanExecute?.Invoke(BuildMenuContext()) ?? true; }
+                    catch { return false; }
+                });
+            _pluginCommands.Add(cmd);
+            return cmd;
+        }
+
+        private void RefreshPluginCommands()
+        {
+            foreach (var c in _pluginCommands) c.NotifyCanExecuteChanged();
         }
 
         // ───────────── Item Changed & Dynamic Command Update ─────────────
@@ -64,6 +95,7 @@ namespace YHG_Assets_Handler.ViewModels
 
             SaveCommand.NotifyCanExecuteChanged();
             SaveAsCommand.NotifyCanExecuteChanged();
+            RefreshPluginCommands();
         }
 
         private void OnCachedViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -173,13 +205,9 @@ namespace YHG_Assets_Handler.ViewModels
             targetItem ??= CurrentExplorerItem;
             if (targetItem == null) return;
 
-            if (targetItem.Parent != null)
-            {
-                if (TryGetViewModel<UnityBundleInspectorViewModel>(out var s, targetItem.Parent))
-                {
-                    return;   
-                }
-            }
+            // Virtual children (e.g. entries inside a container file) are closed with their parent
+            if (targetItem.Parent != null && !targetItem.CanCloseIndependently)
+                return;
 
             if (targetItem.CachedViewModel is { } vm)
             {
@@ -278,26 +306,6 @@ namespace YHG_Assets_Handler.ViewModels
         }
 
 
-        [RelayCommand]
-        private void AddAsset()
-        {
-            if (CurrentExplorerItem?.FileType == FileType.UnityAsset)
-            {
-                if (CurrentWorkspaceView is UnityAssetsInspectorViewModel unityVm)
-                {
-                    var workspace = unityVm.workspace;
-                    var dialog = new AddAssetView(workspace)
-                    {
-                        Owner = Application.Current.MainWindow
-                    };
-                    if (dialog.ShowDialog() == true)
-                    {
-                        Status.Write($"Asset created successfully in {CurrentExplorerItem.Name}", StatusType.Success);
-                        SaveCommand.NotifyCanExecuteChanged();
-                    }
-                }
-            }
-        }
         // ───────────── Loading ─────────────
 
         public void LoadFileDirectly(string filePath)
@@ -338,7 +346,7 @@ namespace YHG_Assets_Handler.ViewModels
 
                 foreach (string file in Directory.EnumerateFiles(folderPath))
                 {
-                    if (UnityAssetWorkspace.IsSplitFile(file)) continue;
+                    if (PluginManager.Instance.IsHidden(file)) continue;
                     item.Children.Add(LoadFile(file));
                 }
             }
@@ -362,19 +370,18 @@ namespace YHG_Assets_Handler.ViewModels
             }
 
             item.CachedViewModel ??= CreateViewModel(item);
-            (item.CachedViewModel as UnityAssetsInspectorViewModel)?.EnsureLoaded();   // bundle child lazy load
+            item.CachedViewModel?.OnActivated();   // lazy-load hook (plugins decide what it does)
             CurrentWorkspaceView = item.CachedViewModel;
             CurrentExplorerItem = item;
         }
 
         public BaseViewModel? CreateViewModel(ExplorerItem item)
         {
-            return item.FileType switch
-            {
-                FileType.UnityAsset => new UnityAssetsInspectorViewModel(item),
-                FileType.UnityBundle => new UnityBundleInspectorViewModel(item),
-                _ => new DefaultInspectorViewModel(item),
-            };
+            var result = PluginManager.Instance.CreateViewModel(item);
+            if (result.Error != null)
+                Status.Write($"Failed to open {item.Name}: {result.Error}", StatusType.Error);
+
+            return result.ViewModel ?? new DefaultInspectorViewModel(item);
         }
 
         // ───────────── Closing & Teardown ─────────────
@@ -441,73 +448,9 @@ namespace YHG_Assets_Handler.ViewModels
         }
 
         [RelayCommand]
-        private void AssetFileInfos()
+        private void OpenPluginManager()
         {
-            if (TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
-            {
-                UnityAssetFilesInfos f = new(vm.workspace);
-                f.ShowDialog();
-            }
-        }
-
-        [RelayCommand]
-        private async Task AddFilesToWorkspace()
-        {
-            if (!TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
-                return;
-
-            var ofd = new OpenFileDialog
-            {
-                Title = "Select Assets Files to Add to Workspace",
-                Filter = "Unity Assets Files (*.assets;*.*)|*.assets;*.*",
-                Multiselect = true
-            };
-
-            if (ofd.ShowDialog() != true || ofd.FileNames.Length == 0)
-                return;
-
-            int loaded = await vm.LoadFilesAsync(ofd.FileNames, "Adding Files to Workspace");
-            Status.Write($"Added {loaded}/{ofd.FileNames.Length} file(s) to workspace.",
-                loaded > 0 ? StatusType.Success : StatusType.Warning);
-        }
-
-        private bool TryGetViewModel<T>([NotNullWhen(true)] out T? vm, ExplorerItem? explorer = null) where T : BaseViewModel
-        {
-            explorer ??= CurrentExplorerItem;
-
-            if (explorer?.CachedViewModel is T match)
-            {
-                vm = match;
-                return true;
-            }
-
-            vm = default;
-            return false;
-        }
-
-        [RelayCommand]
-        private void SetupMonoGenerator()
-        {
-            if (TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
-            {
-                vm.workspace.SetMonoTempGenerators(string.Empty);
-            }
-        }
-
-        [RelayCommand]
-        private void UnityAssetsSplitMerge()
-        {
-            WindowHelper.ShowSingle<UnityAssetsMergeSplitter>();
-        }
-
-        [RelayCommand]
-        private void DataGridFilter()
-        {
-            if (TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
-                vm.OpenFilter();
-            else
-                NotificationManager.Info("Open an assets file first to use the filter.", "Filter",
-                    key: "filter-no-workspace");
+            WindowHelper.ShowSingle<PluginManagerWindow>();
         }
 
         [RelayCommand]
@@ -526,17 +469,6 @@ namespace YHG_Assets_Handler.ViewModels
         private void Donation()
         {
             WindowHelper.ShowSingle<DonationWindow>();
-        }
-
-        [RelayCommand]
-        private async Task Migration()
-        {
-#if DEBUG
-            if (TryGetViewModel(out UnityAssetsInspectorViewModel? vm))
-                await vm.MigrateAssetFile();
-#else
-            NotificationManager.Warning("This feature is not yet available in the public release.");
-#endif
         }
     }
 }

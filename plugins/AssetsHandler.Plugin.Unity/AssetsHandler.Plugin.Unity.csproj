@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>$(NoWarn);NU1701;NU1702;NU1901;NU1902;NU1903;NU1904;NU1605</NoWarn>
+    <!-- Needed so <plugin>.deps.json is emitted next to the dll; the host's AssemblyDependencyResolver reads it. -->
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <!-- Contracts/shared libs are marked Private=false: they come from the host and must NOT be copied into the plugin folder. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\AssetsHandler.Controls\AssetsHandler.Controls.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AssetsHandler.Core\AssetsHandler.Core.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PluginAbstractions\PluginAbstractions.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AssetsTools.NET" Version="3.0.5" />
+    <PackageReference Include="AssetsTools.NET.MonoCecil" Version="3.0.4" />
+    <PackageReference Include="AssetsTools.NET.Texture" Version="3.0.2" />
+    <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+    <PackageReference Include="Fmod5Sharp" Version="3.1.0" />
+    <PackageReference Include="HelixToolkit.Wpf" Version="3.1.2" />
+    <PackageReference Include="StbImageSharp" Version="2.30.16" />
+    <PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <PackageReference Include="YHG.FastBF" Version="1.0.0" />
+    <!-- Newtonsoft.Json, CommunityToolkit.Mvvm, MahApps icon packs reach the plugin transitively via Core/Controls/Abstractions (host provides them). -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="classdata.tpk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="plugin.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Native libs (TexToolHelper.dll ...) -> <plugin>\runtimes\win-x64\native\ -->
+  <ItemGroup>
+    <_PluginNative Include="$(MSBuildThisFileDirectory)..\..\NativeLibs\win-x64\**\*.dll" />
+    <_PluginNative Include="$(SolutionDir)x64\$(Configuration)\*.dll" Condition="'$(SolutionDir)' != ''" />
+  </ItemGroup>
+  <Target Name="CopyNativeToPluginOutput" AfterTargets="Build">
+    <Copy SourceFiles="@(_PluginNative)" DestinationFolder="$(TargetDir)runtimes\win-x64\native\" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!--
+    Collects this plugin (without host-provided DLLs) into <repo>\plugins-out\<ProjectName>\ after every build.
+    The host project copies <repo>\plugins-out\** into its own output / publish folder (convention based, host does not know this plugin).
+  -->
+  <Target Name="DeployPluginToPluginsOut" AfterTargets="CopyNativeToPluginOutput">
+    <PropertyGroup>
+      <_PluginDestDir>$(MSBuildThisFileDirectory)..\..\plugins-out\$(MSBuildProjectName)\</_PluginDestDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_PluginBuildFiles Include="$(TargetDir)**\*"
+                         Exclude="$(TargetDir)PluginAbstractions.*;$(TargetDir)AssetsHandler.Core.*;$(TargetDir)AssetsHandler.Controls.*;$(TargetDir)CommunityToolkit.*;$(TargetDir)MahApps.*;$(TargetDir)Newtonsoft.Json.*;$(TargetDir)YHG.FastBF.*" />
+    </ItemGroup>
+    <MakeDir Directories="$(_PluginDestDir)" />
+    <Copy SourceFiles="@(_PluginBuildFiles)" DestinationFolder="$(_PluginDestDir)%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

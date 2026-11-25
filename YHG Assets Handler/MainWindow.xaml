@@ -20,12 +20,6 @@
         <DataTemplate DataType="{x:Type localVMs:DefaultInspectorViewModel}">
             <localViews:DefaultInspectorView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type localVMs:UnityAssetsInspectorViewModel}">
-            <localViews:UnityAssetsInspectorView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type localVMs:UnityBundleInspectorViewModel}">
-            <localViews:UnityBundleInspectorView />
-        </DataTemplate>
         <Style x:Key="DarkStatusBarProgressBar_01" TargetType="ProgressBar">
             <Setter Property="Height" Value="4" />
             <Setter Property="Background" Value="{StaticResource SurfaceAlt}" />
@@ -84,14 +78,6 @@
             Key="F4"
             Command="{Binding ExitCommand}"
             Modifiers="Alt" />
-        <KeyBinding
-            Key="A"
-            Command="{Binding AddAssetCommand}"
-            Modifiers="Ctrl+Shift" />
-        <KeyBinding
-            Key="F"
-            Command="{Binding DataGridFilterCommand}"
-            Modifiers="Ctrl+Shift" />
     </DarkWindow.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -153,52 +139,8 @@
                     IconKind="Power"
                     InputGestureText="Alt+F4" />
             </DarkMenuItem_01>
-            <DarkMenuItem_01 Header="_View">
-                <DarkMenuItem_01
-                    Command="{Binding AddAssetCommand}"
-                    Header="Add Assets..."
-                    IconKind="PlusBox"
-                    InputGestureText="Ctrl+Shift+A"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-                <DarkMenuItem_01
-                    Command="{Binding AssetFileInfosCommand}"
-                    Header="File Infos..."
-                    IconKind="InformationOutline"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-                <DarkMenuItem_01
-                    Command="{Binding AddFilesToWorkspaceCommand}"
-                    Header="Add Files To workspace"
-                    IconKind="FileSync"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-                <DarkMenuItem_01
-                    Command="{Binding SetupMonoGeneratorCommand}"
-                    Header="Setup Mono Generator"
-                    IconKind="FileCode"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-                <DarkMenuItem_01
-                    Command="{Binding DataGridFilterCommand}"
-                    Header="Filter"
-                    IconKind="Filter"
-                    InputGestureText="Ctrl+Shift+F"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-                <DarkMenuItem_01
-                    Command="{Binding MigrationCommand}"
-                    Header="Migration"
-                    IconKind="FileArrowLeftRight"
-                    VisibleFor="UnityAsset"
-                    VisibleSource="{Binding CurrentExplorerItem.FileType}" />
-            </DarkMenuItem_01>
-            <DarkMenuItem_01 Header="_Tools">
-                <DarkMenuItem_01
-                    Command="{Binding UnityAssetsSplitMergeCommand}"
-                    Header="Unity Assets Merge &amp; Split"
-                    IconKind="FileTree" />
-            </DarkMenuItem_01>
+            <DarkMenuItem_01 x:Name="ViewMenu" Header="_View" Visibility="Collapsed" />
+            <DarkMenuItem_01 x:Name="ToolsMenu" Header="_Tools" Visibility="Collapsed" />
             <DarkMenuItem_01 Header="_App">
                 <DarkMenuItem_01
                     Command="{Binding AboutAppCommand}"

@@ -1,11 +1,12 @@
 ﻿using AssetsHandler.Controls;
+using AssetsHandler.Core.Utils;
+using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using System.Diagnostics;
-using System.Reflection;
-using Microsoft.Win32;
 using YHG_Assets_Handler.Utils;
 
 namespace YHG_Assets_Handler.Views.Windows.Updater

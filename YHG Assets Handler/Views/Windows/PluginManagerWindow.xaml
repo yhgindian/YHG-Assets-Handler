@@ -1,0 +1,180 @@
+<DarkWindow
+    x:Class="YHG_Assets_Handler.Views.Windows.PluginManagerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Plugin Manager"
+    Width="760"
+    Height="560"
+    MinWidth="560"
+    MinHeight="360"
+    Background="{StaticResource AppBg}"
+    Foreground="{StaticResource TextLight}"
+    ShowButtons="Close"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="12,6,12,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Toolbar  -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <DarkButton_01
+                Height="30"
+                Margin="0,0,8,0"
+                Padding="12,0"
+                Command="{Binding InstallCommand}"
+                Content="Install from .zip..."
+                OnHoverBorder="{StaticResource NeonAccent}"
+                OnHoverForeground="{StaticResource NeonAccent}" />
+            <DarkButton_01
+                Height="30"
+                Padding="12,0"
+                Command="{Binding OpenFolderCommand}"
+                Content="Open plugins folder"
+                OnHoverBorder="{StaticResource NeonAccent}"
+                OnHoverForeground="{StaticResource NeonAccent}" />
+        </StackPanel>
+
+        <!--  Restart banner  -->
+        <Border
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            Padding="10,8"
+            Background="{StaticResource SurfaceAlt}"
+            BorderBrush="{StaticResource AccentWarm}"
+            BorderThickness="1"
+            CornerRadius="3"
+            Visibility="{Binding RestartRequired, Converter={StaticResource BoolToVis}}">
+            <DockPanel>
+                <DarkButton_01
+                    Height="26"
+                    Padding="12,0"
+                    Command="{Binding RestartCommand}"
+                    Content="Restart now"
+                    DockPanel.Dock="Right"
+                    OnHoverBorder="#10B981"
+                    OnHoverForeground="#10B981" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource AccentWarm}"
+                    Text="Restart required: plugin changes are applied the next time the app starts."
+                    TextWrapping="Wrap" />
+            </DockPanel>
+        </Border>
+
+        <!--  List  -->
+        <ScrollViewer
+            Grid.Row="2"
+            Margin="0,10,0,0"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Center"
+                    Foreground="{StaticResource TextMuted}"
+                    Text="No plugins installed."
+                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}" />
+
+                <ItemsControl ItemsSource="{Binding Plugins}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="0,0,0,8"
+                                Padding="12,10"
+                                Background="{StaticResource PanelBg}"
+                                BorderBrush="{StaticResource BorderColor}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                FontSize="14"
+                                                FontWeight="SemiBold"
+                                                Foreground="{StaticResource TextLight}"
+                                                Text="{Binding Name}" />
+                                            <TextBlock
+                                                Margin="8,2,0,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                Foreground="{StaticResource TextMuted}"
+                                                Text="{Binding Version, StringFormat=v{0}}" />
+                                        </StackPanel>
+                                        <TextBlock
+                                            Margin="0,2,0,0"
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{Binding StatusBrush}"
+                                            Text="{Binding StatusText}" />
+                                        <TextBlock
+                                            Margin="0,6,0,0"
+                                            Foreground="{StaticResource TextLight}"
+                                            Text="{Binding Description}"
+                                            TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Margin="0,4,0,0"
+                                            FontSize="11"
+                                            Foreground="{StaticResource TextMuted}"
+                                            Text="{Binding Details}"
+                                            TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Margin="0,2,0,0"
+                                            FontSize="11"
+                                            Foreground="{StaticResource TextMuted}"
+                                            Text="{Binding Credits, StringFormat=Credits: {0}}"
+                                            TextWrapping="Wrap" />
+                                        <TextBlock
+                                            Margin="0,6,0,0"
+                                            FontSize="11"
+                                            Foreground="#EF4444"
+                                            Text="{Binding Error}"
+                                            TextWrapping="Wrap"
+                                            Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                        <DarkCheckBox_01
+                                            Content="Enabled"
+                                            IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                            IsEnabled="{Binding CanToggle}" />
+                                        <DarkButton_01
+                                            Height="26"
+                                            Margin="0,8,0,0"
+                                            Padding="12,0"
+                                            Command="{Binding DataContext.UninstallCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}"
+                                            Content="Uninstall"
+                                            IsEnabled="{Binding CanUninstall}"
+                                            OnHoverBg="#2A1215"
+                                            OnHoverBorder="#EF4444"
+                                            OnHoverForeground="#EF4444" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!--  Message  -->
+        <TextBlock
+            Grid.Row="3"
+            Margin="0,8,0,0"
+            FontSize="11"
+            Foreground="{StaticResource TextMuted}"
+            Text="{Binding Message}"
+            TextWrapping="Wrap" />
+    </Grid>
+</DarkWindow>

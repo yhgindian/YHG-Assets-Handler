@@ -42,6 +42,22 @@ namespace AssetsHandler.Core
             return GetOrLoad(fullPath, () => LoadLibraryEx(fullPath, IntPtr.Zero, LOAD_WITH_ALTERED_SEARCH_PATH));
         }
 
+        /// <summary>Loads a native library from an explicit folder (used by plugins that ship their own natives).</summary>
+        public static IntPtr LoadFrom(string directory, string dllName)
+        {
+            if (string.IsNullOrWhiteSpace(dllName) || string.IsNullOrWhiteSpace(directory))
+                return IntPtr.Zero;
+
+            if (!dllName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                dllName += ".dll";
+
+            string fullPath = Path.Combine(directory, dllName);
+            if (!File.Exists(fullPath))
+                return IntPtr.Zero;
+
+            return GetOrLoad(fullPath, () => LoadLibraryEx(fullPath, IntPtr.Zero, LOAD_WITH_ALTERED_SEARCH_PATH));
+        }
+
         private static string GetTargetDirectory(DllDir dllDir)
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
